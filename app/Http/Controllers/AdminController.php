@@ -8,4 +8,5 @@ use DB;
 class AdminController extends Controller
 {
 
+
 }

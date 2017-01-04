@@ -14,6 +14,7 @@ class VerifyCsrfToken extends BaseVerifier
     protected $except = [
       'callback',
       'fake-call',
-      'postback'
+      'postback',
+      'listener',
     ];
 }

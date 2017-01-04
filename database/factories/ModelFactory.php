@@ -11,21 +11,20 @@
 |
 */
 
-$factory->define(App\Post::class, function(Faker\Generator $faker){
-  $title = $faker->sentence($nbwords = 5, $variableNbWords = true);
-
+$factory->define(App\Product::class, function(Faker\Generator $faker){
+  $product_name = $faker->sentence($nbWords = 6, $variableNbWords = true);
   return [
-    'title' => $title,
-    'slug' => str_slug($title, '-'),
-    'body' => $faker->text($maxNbChars = 500),
+    'product_name' => $product_name,
+    'slug' => str_slug($product_name, '-'),
+    'product_price' => $faker->randomDigit(),
+    'product_description' => $faker->sentence($nbwords = 10),
   ];
 });
 
-
-$factory->define(App\Product::class, function(Faker\Generator $faker){
+$factory->define(App\Sale::class, function(Faker\Generator $faker){
   return [
-    'product_name' => $faker->words($nb = 3, $asText = false),
-    'price' => $faker->randomDigit(),
-    'product_description' => $faker->sentence($nbwords = 10),
+    'buyers_name' => $faker->name,
+    'buyers_email' => $faker->email,
+    'transaction_id' => $faker->uuid,
   ];
 });

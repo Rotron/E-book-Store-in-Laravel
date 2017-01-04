@@ -7,41 +7,31 @@ use App\Product;
 use Illuminate\Support\Facades\Storage;
 use \GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use App\PaypalIPN;
+use App\Paypal;
 
 class ProductsController extends Controller
 {
 
+  public function __construct()
+  {
+    $this->paypal = new Paypal('http://localhost/listener');
+  }
+
   public function index()
   {
-    return view('index', ['products' => Product::paginate(10)]);
+    //$this->paypal->postSampleDataToListener();
+    return $this->paypal->fakeCallbackToPaypal();
   }
 
-  public function product($slug, $id)
+  public function listener()
   {
-    $products = Product::find($id);
-    return view(['products' => $products]);
+    $this->paypal->storeData();
   }
 
-  public function ipnResponse(PaypalIPN $paypalIPN)
+  public function product($slug = '', $id)
   {
-    return $paypalIPN->displayData();
-  }
-
-  public function postback()
-  {
-      return response()->json(['key' => file_get_contents('php://input')]);
-  }
-
-  public function callback(PaypalIPN $paypalIPN, Request $request)
-  {
-    // $content = file_get_contents('php://input');
-    // Storage::put('ipn_log.txt', $content);
-    // $paypalIPN->storeData();
-
-    dd($paypalIPN->liveCallback($request));
-    dd($paypalIPN->displayData('array'));
-    dd($paypalIPN->fakeCallbackToPaypal());
+    $product = Product::find($id);
+    return view('product', ['product' => $product]);
   }
 
   /* Display avaiable products */

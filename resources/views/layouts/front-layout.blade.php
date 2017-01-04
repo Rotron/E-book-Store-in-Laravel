@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <div class="container-fluid">
+    <div class="container">
 
       <div class="row">
         @section('header')
@@ -20,9 +20,7 @@
         @show
       </div>
 
-      <div class="row">
         @yield('content')
-      </div>
 
       <div class="row">
         @section('footer')
