@@ -8,27 +8,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
-    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/admin/sidebar.css" rel="stylesheet">
+    <link href="/css/admin/global.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <div class="container">
 
+    <div class="container-fluid fill">
       <div class="row">
-        @section('header')
-          @include('header')
-        @show
+        <div class="col-md-3"> @include('admin.sidebar') </div>
+        <div class="col-md-9"> @yield('content') </div>
       </div>
-
-        @yield('content')
-
-      <div class="row">
-        @section('footer')
-          @include('footer')
-        @show
-      </div>
-
     </div>
-    <script src="/public/custom.js">
+
+    <script src="/public/custom.js"></script>
   </body>
+
 </html>

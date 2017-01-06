@@ -109,23 +109,38 @@
     /* If ipn_log.txt doesn't have querystring make
     /* a test IPN request from sandbox to this storeData() method.
     */
-    public function fakeCallbackToPaypal()
+    public function fakeCallbackToPaypal($callType)
     {
-      $data = $this->formatDataCentral('stored');
+      if ($callType !== 'stream' and $callType !== 'stored') {
+        throw new \Exception('Invalid argument, only stored and stream accepted');
+      }
 
-      if (strlen($this->storedData) > 1) {
+      if ($callType == 'stream') {
+        $data = $this->formatDataCentral('stream');
+        $this->postToSandbox($data);
+      } else {
+        $data = $this->formatDataCentral('stored');
 
-        try{
-          $resp = $this->guzzleClient->request('post', 'https://www.sandbox.paypal.com/cgi-bin/webscr', [
+        if (strlen($this->storedData) > 1) {
+          $this->postToSandbox($data);
+        } else {
+          throw new \Exception('Ipn_log.txt is empty.. Post data using sample poster to fill..');
+        }
+      }
+
+    }
+
+    // Make a call to sandbox, either from stream or from storage.
+    private function postToSandbox($data)
+    {
+      try {
+          $resp = $this->guzzleClient->request('post', $url, [
             'query' => $data
           ]);
           return $resp->getBody()->getContents();
-
-        } catch( RequestException $e) {
-          echo Psr7\str($e->getRequest());
-          echo Psr7\str($e->getResponse());
-        }
-
+      } catch( RequestException $e) {
+        echo Psr7\str($e->getRequest());
+        echo Psr7\str($e->getResponse());
       }
     }
 
@@ -204,16 +219,16 @@
     public function validatePayment(Request $request)
     {
       self::checkStream();
+
       $paymentStatus = $request->input('status');
 
       if ($paymentStatus == 'Completed') {
         $price = $request->input('amount');
-
         $itemName = $request->input('item_name');
-
         $itemNumber = $request->input('item_number');
-
       }
+
+      
 
     }
 
@@ -221,6 +236,7 @@
     /**
     /* Transaction id is always unique. If transaction id already exists in the
     /* database it means you've already processed that transaction.
+    /* This method is to check exactly that.
     */
     static function isDoublePost($table = 'Sales', $column = 'transaction_id')
     {

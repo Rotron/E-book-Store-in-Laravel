@@ -9,19 +9,34 @@ class AdminLoginController extends Controller
 {
   public function adminLoginView()
   {
-
+    return view('admin/login');
   }
 
-  public function adminLogin()
+  public function login(Request $request)
   {
-    if (Auth::attempt(['username' => 'admin', 'password' => 'admin'])) {
-      Auth::intended('admincp');
+    $this->validate($request, [
+      'username' => 'required',
+      'password' => 'required',
+    ]);
+
+    $username = $request->input('username');
+    $password = $request->input('password');
+
+    if (Auth::attempt(['username' => $username, 'password' => $password])) {
+      return redirect()->intended('admin/admincp');
     }
-    return 'failed';
+    return redirect('admin')->with(['loginFailed' => 'Wrong user or pass']);
+  }
+
+  public function logout()
+  {
+    Auth::logout();
+    return redirect('admin')->with(['loggedOut' => 'You have been logged out']);
   }
 
   public function admincp()
   {
-
+    return view('admin/admincp');
   }
+
 }

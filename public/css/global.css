@@ -1,0 +1,46 @@
+body, html
+{
+  background-color:black;
+  color:white;
+}
+
+.verticalGap
+{
+  padding-bottom :25px;
+}
+
+#navbarCollapse
+{
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#444948+52,0a0809+52 */
+  background: #444948; /* Old browsers */
+  background: -moz-linear-gradient(top, #444948 52%, #0a0809 52%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #444948 52%,#0a0809 52%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #444948 52%,#0a0809 52%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#444948', endColorstr='#0a0809',GradientType=0 ); /* IE6-9 */
+}
+
+.navbar-default
+{
+  border-color: #3E3D3D !important;
+}
+
+.pagination > li > a, .pagination > li > span
+{
+  background-color:black !important;
+}
+
+#navbarCollapse a
+{
+  color:white !important;
+}
+
+#navbarHeading
+{
+  color:white;
+}
+
+#logo a
+{
+  color: yellow !important;
+  text-decoration:underline;
+}

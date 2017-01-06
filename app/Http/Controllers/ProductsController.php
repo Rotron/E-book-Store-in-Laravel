@@ -19,13 +19,13 @@ class ProductsController extends Controller
 
   public function index()
   {
-    //$this->paypal->postSampleDataToListener();
-    return $this->paypal->fakeCallbackToPaypal();
+    return view('index', ['products' => Product::paginate(10)]);
   }
 
   public function listener()
   {
     $this->paypal->storeData();
+    dd($this->paypal->storeData());
   }
 
   public function product($slug = '', $id)

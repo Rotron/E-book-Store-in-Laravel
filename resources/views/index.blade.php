@@ -1,5 +1,5 @@
 
-@extends('layouts.front-layout')
+@extends('layouts.layout')
 
   @section('content')
 
@@ -10,12 +10,12 @@
     @foreach($products->chunk(4) as $chunk)
       <div class="row">
         @foreach($chunk as $product)
-          <div class="col-md-3">
+          <div class="verticalGap col-md-3">
             <form action="https://www.sandbox.paypal.com/webscr" method="post">
               <a href="/product/{{$product->slug}}/{{$product->id}}">
                  <b> {{ strtoupper($product->product_name) }} </b>
               </a> <br>
-              {{ substr($product->product_description, 0, 10) }}
+              {{ substr($product->product_description, 0, 50) }}
               <input type="hidden" name="cmd" value="_xclick">
               <input type="hidden" name="business" value="seosatanforum-facilitator@gmail.com">
 
@@ -31,5 +31,5 @@
         @endforeach
       </div>
     @endforeach
-
+    {{ $products->links() }}
   @endsection
