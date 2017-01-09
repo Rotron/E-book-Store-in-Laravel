@@ -10,7 +10,8 @@
   <div class="collapse navbar-collapse" id="myNavbar">
     <ul id="adminSidebarBody" class="nav navbar-nav" >
       <li id="adminSidebarHeading"> <a href="/admin/admincp"> {{ config('app.name') }} </a> </li>
-      <li> <a href="/admin/logout"> Logout </a> </li>
+      <li> <a href="/admin/listing/new"> New </a> </li>
+      <li> <a href="/admin/logout"> Bye! </a> </li>
     </ul>
   </div>
 </nav>

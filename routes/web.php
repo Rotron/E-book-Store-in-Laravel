@@ -2,11 +2,9 @@
 
 use App\Http\Middleware\RedirectGuest;
 
-Route::get('/', 'ProductsController@index');
-Route::get('product/{product}/{id}', 'ProductsController@product');
+Route::get('/', 'ListingController@index');
 
-Route::post('listener', 'ProductsController@listener');
-
+Route::get('listing/{name}/{id}', 'ListingController@listing');
 
 
 /* Admin login */
@@ -15,6 +13,15 @@ Route::post('admin/login', 'AdminLoginController@login');
 
 
 Route::group(['middleware' => 'redirectGuest'], function(){
-  Route::get('admin/admincp', 'AdminLoginController@admincp');
+  Route::get('admin/admincp', 'ListingController@admincp');
   Route::get('admin/logout', 'AdminLoginController@logout');
+
+  Route::get('admin/listing/new', 'ListingController@newListingView');
+  Route::post('admin/listing/new', 'ListingController@newListing');
+
+
+  Route::get('admin/listing/edit/{id}', 'ListingController@editListingView');
+  Route::post('admin/listing/edit', 'ListingController@editListing');
+
+  Route::delete('admin/listing/delete', 'ListingController@deleteListings');
 });

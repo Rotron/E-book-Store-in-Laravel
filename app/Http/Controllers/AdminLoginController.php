@@ -34,9 +34,4 @@ class AdminLoginController extends Controller
     return redirect('admin')->with(['loggedOut' => 'You have been logged out']);
   }
 
-  public function admincp()
-  {
-    return view('admin/admincp');
-  }
-
 }

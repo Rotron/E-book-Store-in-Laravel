@@ -10,7 +10,7 @@ class SalesTableCreate extends Migration
   {
     Schema::create('sales', function(Blueprint $table){
       $table->increments('id');
-      $table->integer('product_id');
+      $table->integer('listing_id');
       $table->string('buyers_name');
       $table->string('buyers_email');
       $table->string('transaction_id');

@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Sale extends Model
 {
 
-  public function product()
+  public function listing()
   {
-    return $this->belongsTo(App\Product::class);
+    return $this->belongsTo('App\Listing');
   }
 
 }
