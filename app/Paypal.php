@@ -4,31 +4,73 @@
   use GuzzleHttp\Client;
   use GuzzleHttp\Psr7;
   use GuzzleHttp\Exception\RequestException;
+  use App\Listing;
+  Use App\Transaction;
 
   class Paypal
   {
     const FILENAME = 'ipn_log.txt';
-    protected $streamData;
-    protected $storedData;
-    protected $guzzleClient;
-    public $listenerUrl;
-    public $sampleData;
+    private $guzzleClient;
+    private $streamData;
+    private $storedData;
+    private $listenerUrl = 'listener';
+    private $sampleData = 'mc_gross=19.95&protection_eligibility=Eligible&address_status=confirmed&payer_id=LPLWNMTBWMFAY&tax=0.00&address_street=1+Main+St&payment_date=20%3A12%3A59+Jan+13%2C+2009+PST&payment_status=Completed&charset=windows-1252&address_zip=95131&first_name=Test&mc_fee=0.88&address_country_code=US&address_name=Test+User&notify_version=2.6&custom=&payer_status=verified&address_country=United+States&address_city=San+Jose&quantity=1&verify_sign=AtkOfCXbDm2hu0ZELryHFjY-Vb7PAUvS6nMXgysbElEn9v-1XcmSoGtf&payer_email=gpmac_1231902590_per%40paypal.com&txn_id=61E67681CH3238416&payment_type=instant&last_name=User&address_state=CA&receiver_email=gpmac_1231902686_biz%40paypal.com&payment_fee=0.88&receiver_id=S8XGHLYDW9T3S&txn_type=express_checkout&item_name=&mc_currency=USD&item_number=&residence_country=US&test_ipn=1&handling_amount=0.00&transaction_subject=&payment_gross=19.95&shipping=0.00';
+    private $transaction_id = 'transaction_id';
+    private $amountColumn = 'amount';
+    private $itemNameColumn = 'item_name';
+    private $itemNumberColumn = 'id';
 
-    function __construct($listenerUrl)
+    function __construct()
     {
+      $this->guzzleClient = new Client;
+
       if (!Storage::exists(self::FILENAME, '')) {
         Storage::put(self::FILENAME, '');
       }
 
+      $this->streamData     = file_get_contents('php://input');
+      $this->storedData     = Storage::get(self::FILENAME);
+    }
+
+    // Url where data is POSTed
+    public function setListenerUrl($listenerUrl)
+    {
       $this->listenerUrl = $listenerUrl;
+    }
 
-      $this->streamData = file_get_contents('php://input');
+    public function setProductModel($productModel)
+    {
+      $this->productsModel = $productsModel;
+    }
 
-      $this->storedData = Storage::get(self::FILENAME);
+    public function setTransactionsTable($transactionsTable)
+    {
+      $this->transactionsTable = $transactionsTable;
+    }
 
-      $this->guzzleClient = new Client;
+    public function setTransactionIdColumn($transactionIdColumn)
+    {
+      $this->transactionIdColumn = $transactionIdColumn;
+    }
 
-      $this->sampleData = "mc_gross=19.95&protection_eligibility=Eligible&address_status=confirmed&payer_id=LPLWNMTBWMFAY&tax=0.00&address_street=1+Main+St&payment_date=20%3A12%3A59+Jan+13%2C+2009+PST&payment_status=Completed&charset=windows-1252&address_zip=95131&first_name=Test&mc_fee=0.88&address_country_code=US&address_name=Test+User&notify_version=2.6&custom=&payer_status=verified&address_country=United+States&address_city=San+Jose&quantity=1&verify_sign=AtkOfCXbDm2hu0ZELryHFjY-Vb7PAUvS6nMXgysbElEn9v-1XcmSoGtf&payer_email=gpmac_1231902590_per%40paypal.com&txn_id=61E67681CH3238416&payment_type=instant&last_name=User&address_state=CA&receiver_email=gpmac_1231902686_biz%40paypal.com&payment_fee=0.88&receiver_id=S8XGHLYDW9T3S&txn_type=express_checkout&item_name=&mc_currency=USD&item_number=&residence_country=US&test_ipn=1&handling_amount=0.00&transaction_subject=&payment_gross=19.95&shipping=0.00";
+    public function setAmountColumn($amountColumn)
+    {
+      $this->amountColumn = $amountColumn;
+    }
+
+    public function setItemNameColumn($itemNameColumn)
+    {
+      $this->itemNameColumn = $itemNameColumn;
+    }
+
+    public function setItemNumberColumn($itemNumberColumn)
+    {
+      $this->itemNumberColumn = $itemNumber;
+    }
+
+    public function setSampleData($sampleData)
+    {
+      $this->sampleData = $sampleData;
     }
 
 
@@ -185,7 +227,7 @@
     }
 
 
-    // check if data in post exists
+    // check if data in POST exists
     static function checkStream()
     {
       if (empty(file_get_contents("php://input"))) {
@@ -196,18 +238,21 @@
     }
 
     /**
-    /* Callback to Paypal's live server to verify transaction autnenticity.
+    /* Callback to Paypal's live server to verify transaction authenticity.
     */
     public function liveCallback($request)
     {
       self::checkStream();
 
+      // Format the data
       $streamData = $this->formatDataCentral('stream');
 
+      // POST back to paypals live server
       $response = $this->guzzleClient->request('post', 'https://www.paypal.com/cgi-bin/webscr', [
         'query' => $streamData
       ]);
 
+      // Return the response
       return $response->getBody()->getContents();
     }
 
@@ -216,7 +261,7 @@
     /* Check transaction is 'Completed'
     /*
     */
-    public function validatePayment(Request $request)
+    public function isCorrectPayment(Request $request)
     {
       self::checkStream();
 
@@ -228,8 +273,13 @@
         $itemNumber = $request->input('item_number');
       }
 
-      
+      if (($price == Product::findOrFail($itemNumber)->id) &&
+          ($itemName == Product::findOrFail($itemNumber)->item_name) &&
+          ($itemNumber == Product::findOrFail($itemNumber)->id)) {
+          return true;
+      }
 
+      return false;
     }
 
 
@@ -238,12 +288,12 @@
     /* database it means you've already processed that transaction.
     /* This method is to check exactly that.
     */
-    static function isDoublePost($table = 'Sales', $column = 'transaction_id')
+    public function isDoublePost()
     {
       self::checkStream();
 
-      $transactionId = $request->input('parent_txn_id');
-      $transactionMatch = $table::where('transaction_id', $transactionId)->get();
+      $transactionId    = $request->input('parent_txn_id');
+      $transactionMatch = Transaction::where('transaction_id', $transactionId)->get();
 
       if (count($transactionMatch) > 1) {
         return true;
@@ -252,6 +302,34 @@
       return false;
     }
 
+    /**
+    /* Store the transaction details.
+    /* If same user purchases product more than ones. Only update sold quantity
+    */
+    public function storeTransaction()
+    {
+      $transaction = new Transaction;
+
+      $listing = Listing::find($request->input('item_numberx'));
+
+      if (!$listing->transactions->where('email', $request->input('payer_email'))->first()) {
+        $transaction->email = $request->input('payer_email');
+      }
+
+      if (!$listing->transactions->where('first_name', $request->input('first_name'))->first()) {
+        $transaction->first_name = $request->input('first_name');
+      }
+
+      if (!$listing->transactions->where('last_name', $request->input('last_name'))->first()) {
+        $transaction->last_name = $request->input('last_name');
+      }
+
+      $listing->increment('sold');
+
+      $transaction->transaction_id = $request->input('parent_txn_id');
+
+      $listing->transaction()->save($transaction);
+    }
 
   }
 

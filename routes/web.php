@@ -2,10 +2,13 @@
 
 use App\Http\Middleware\RedirectGuest;
 
+// Paid listings..
 Route::get('/', 'ListingController@index');
-
 Route::get('listing/{name}/{id}', 'ListingController@listing');
 
+// Free listings..
+Route::get('listings/free', 'ListingController@freeListings');
+Route::get('listing/{name}/{id}', 'ListingController@freeListing');
 
 /* Admin login */
 Route::get('admin', 'AdminLoginController@adminLoginView');
@@ -21,7 +24,7 @@ Route::group(['middleware' => 'redirectGuest'], function(){
 
 
   Route::get('admin/listing/edit/{id}', 'ListingController@editListingView');
-  Route::post('admin/listing/edit', 'ListingController@editListing');
+  Route::patch('admin/listing/edit', 'ListingController@editListing');
 
   Route::delete('admin/listing/delete', 'ListingController@deleteListings');
 });

@@ -2,23 +2,45 @@
 @extends('admin.layouts.layout')
 
 @section('content')
+  <h1> Add a new Listing </h1>
+
   @foreach($errors->all() as $error)
-    {{ $error }}
+    <div class="alert alert-warning"> {{ $error }} </div>
   @endforeach
 
   @if(session('listingCreated'))
-    <div class="alert alert-success"> {{ session('listingCreated') }} </div>
+    <br> <div class="alert alert-success"> {{ session('listingCreated') }} </div>
   @endif
 
+  <br>
   <form method="POST" action="/admin/listing/new" enctype="multipart/form-data">
-    <label> </label>
-    <input type="text" name="listingName"> <br>
-    <textarea name="listingDescription"></textarea> <br>
-    <input type="number" name="listingPrice" min="1" max="1000"> <br>
-    <input type="file" name="listingPdf" accept="application/pdf"> <br>
-    <input type="file" name="listingImage" accept="image/*"> <br>
+    <div class="form-group">
+      <label for="listingName">Listing Name</label>
+      <input id="listingName" class="form-control" type="text" name="listingName"> <br>
+    </div>
+
+    <div class="form-group">
+      <label for="listingDescription">Listing Description</label>
+      <textarea rows="10" class="form-control" id="listingDescription" name="listingDescription"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="listingPrice">Price($)</label>
+      <input class="form-control" type="number" name="listingPrice" min="1" max="1000"> <br>
+    </div>
+
+    <div class="form-group">
+      <label for="listingPdf"> Upload PDF </label>
+      <input id="listingPdf" class="btn btn-default" type="file" name="listingPdf" accept="application/pdf"> <br>
+    </div>
+
+    <div class="form-group">
+      <label for="listingImage"> Upload Image - 150x150px </label>
+      <input id="listingImage" class="btn btn-default" type="file" name="listingImage" accept="image/*"> <br>
+    </div>
+
     {{ csrf_field() }}
-    <input type="submit" value="Create Listing">
+    <input class="btn btn-info" type="submit" value="Create Listing">
   </form>
 
 @endsection

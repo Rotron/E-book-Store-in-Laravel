@@ -1,15 +1,21 @@
 @extends('admin.layouts.layout')
 
 @section('content')
+  <h1> Dashboard </h1>
   @if(count($errors) > 0)
     @foreach($errors->all() as $error)
       {{ $error }}
     @endforeach
   @endif
 
-  @if(session('deleteListings'))
-    {{ session('deleteListings') }}
+  @if(session('listingDeleted'))
+    <br> <div class="alert alert-success"> {{ session('listingDeleted') }} </div>
   @endif
+
+  @if(session('selectListing'))
+    <br> <div class="alert alert-warning"> {{ session('selectListing') }} </div>
+  @endif
+
   <form method="post" action="/admin/listing/delete">
     <table class="table">
       <thead>

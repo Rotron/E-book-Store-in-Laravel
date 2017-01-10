@@ -12,7 +12,7 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="nav navbar-nav">
         <li class="navbarStyle"><a href="/">Home</a></li>
-        <li class="navbarStyle"><a href="/free">Free e-books</a></li>
+        <li class="navbarStyle"><a href="/listings/free">Free e-books</a></li>
         <li class="navbarStyle"><a href="/contact">Contact</a></li>
       </ul>
     </div>
