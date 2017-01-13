@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Listing extends Model
 {
-  public function transaction()
+  public function transactions()
   {
     $this->hasMany('App\Transaction');
   }

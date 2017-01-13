@@ -6,10 +6,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateListingsTable extends Migration
 {
-  use Illuminate\Support\Facades\Schema;
-  use Illuminate\Database\Schema\Blueprint;
-  use Illuminate\Database\Migrations\Migration;
-
     public function up()
     {
       Schema::table('listings', function (Blueprint $table) {
@@ -22,7 +18,6 @@ class CreateListingsTable extends Migration
          $table->string('listing_pdf');
          $table->string('listing_image');
          $table->timestamps();
-
       });
     }
 

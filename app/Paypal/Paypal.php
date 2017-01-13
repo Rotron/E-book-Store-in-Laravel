@@ -1,5 +1,5 @@
 <?php
-  namespace App;
+  namespace App\Paypal;
   use Illuminate\Support\Facades\Storage;
   use GuzzleHttp\Client;
   use GuzzleHttp\Psr7;
@@ -292,8 +292,8 @@
     {
       self::checkStream();
 
-      $transactionId    = $request->input('parent_txn_id');
-      $transactionMatch = Transaction::where('transaction_id', $transactionId)->get();
+      $transactionId    = $request->input('txn_id');
+      $transactionMatch = Transaction::where('txn_id', $transactionId)->get();
 
       if (count($transactionMatch) > 1) {
         return true;
@@ -304,31 +304,40 @@
 
     /**
     /* Store the transaction details.
-    /* If same user purchases product more than ones. Only update sold quantity
+    /* If same user purchases SAME product more than ones,
+    /* which is checked using product_id and other info in transactions table.
+    /* Then update sold quantity column. If transaction is new,
+    /* then insert new record
     */
-    public function storeTransaction()
+    public function storeTxn()
     {
-      $transaction = new Transaction;
+      $transactions = new Transaction;
+      $firstName    = $request->input('first_name');
+      $lastName     = $request->input('last_name');
+      $payerEmail   = $request->input('payer_email');
+      $itemNumber   = $request->input('item_number');
+      $txnId        = $request->input('txn_id');
+      $listing      = Listing::find($itemNumber);
 
-      $listing = Listing::find($request->input('item_numberx'));
-
-      if (!$listing->transactions->where('email', $request->input('payer_email'))->first()) {
-        $transaction->email = $request->input('payer_email');
+      // Only insert if email doesn't exist.
+      if (!$listing->transactions->where('email', $payerEmail)->first()) {
+        $transaction->email       = $payerEmail;
+        $transaction->first_name  = $firstName;
+        $transaction->last_name   = $lastName;;
       }
 
-      if (!$listing->transactions->where('first_name', $request->input('first_name'))->first()) {
-        $transaction->first_name = $request->input('first_name');
-      }
+      $listing->increment('total_sold');
 
-      if (!$listing->transactions->where('last_name', $request->input('last_name'))->first()) {
-        $transaction->last_name = $request->input('last_name');
-      }
-
-      $listing->increment('sold');
-
-      $transaction->transaction_id = $request->input('parent_txn_id');
+      $transaction->txn_id = $txnId;
 
       $listing->transaction()->save($transaction);
+    }
+
+    // Generate download url for paid file
+    public function download($itemNumber)
+    {
+      $download = Listing::findOrFail($itemNumber)->listing_pdf;
+      storage_path();
     }
 
   }

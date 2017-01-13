@@ -12,6 +12,8 @@ class AdminLoginController extends Controller
     return view('admin/login');
   }
 
+
+  // Validate request and login
   public function login(Request $request)
   {
     $this->validate($request, [
@@ -28,6 +30,8 @@ class AdminLoginController extends Controller
     return redirect('admin')->with(['loginFailed' => 'Wrong user or pass']);
   }
 
+
+  // Logout and redirect back with message
   public function logout()
   {
     Auth::logout();

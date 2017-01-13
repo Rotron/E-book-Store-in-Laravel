@@ -54,6 +54,13 @@ class ListingController extends Controller
     return view('admin/new');
   }
 
+
+  // Replace space with dashes and return.
+  public function addDashes($fileName)
+  {
+    return str_replace(' ', '-', $request->file($fileName)->getClientOriginalName());
+  }
+
   /* Create new listing */
   public function newListing(Request $request)
   {
@@ -68,9 +75,9 @@ class ListingController extends Controller
     ]);
 
     // Convert spaces to dash(-)
-    $pdfFilename      = str_replace(' ', '-', $request->file('listingPdf')->getClientOriginalName());
-    $imageFilename    = str_replace(' ', '-', $request->file('listingImage')->getClientOriginalName());
-
+    $pdfname = addDashes('listingPdf');
+    $imageName = addDashes('listingImage');
+    
     // Upload the files
     $uploadPdf        = $request->file('listingPdf')->storeAs('downloads', $pdfFilename);
     $uploadImage      = $request->file('listingImage')->storeAs('images', $imageFilename);
@@ -128,7 +135,15 @@ class ListingController extends Controller
     return view('admin/edit', ['listing' => Listing::findOrFail($id)]);
   }
 
-  // Update listing.
+
+  /**
+  /* Validate the request.
+  /* Replace spaces in file names with dashes.
+  /* Upload the file with modified name.
+  /* If uploaded files are new(matched using file names in database and storage)
+  /* then upload them and delete the old files associated with same listing.
+  /* Assign values to database.
+  */
   public function editListing(Request $request)
   {
     $listingId = $request->input('id');
@@ -142,48 +157,38 @@ class ListingController extends Controller
     ]);
 
     if ($request->file('listingPdf')) {
-      // Convert spaces in file names to dash(-) my-new-pdf.pdf
-      $pdfFilename      = str_replace(' ', '-', $request->file('listingPdf')->getClientOriginalName());
-
-      // Upload the PDF file with modified name
-      $uploadPdf        = $request->file('listingPdf')->storeAs('downloads', $pdfFilename);
+      $pdfName      = str_replace(' ', '-', $request->file('listingPdf')->getClientOriginalName());
     }
 
     if ($request->file('listingImage')) {
-      $imageFilename    = str_replace(' ', '-', $request->file('listingImage')->getClientOriginalName());
+      $imageName    = str_replace(' ', '-', $request->file('listingImage')->getClientOriginalName());
+    }
 
-      // Upload the image with modified name
+    if (Listing::findOrFail($id)->listing_pdf !== $pdfName) {
+      $this->deleteOldImage($listingId);
+      $uploadPdf        = $request->file('listingPdf')->storeAs('downloads', $pdfName);
+    }
+
+    if (Listing::findOrFail($id)->listing_image !== $imageName) {
+      $this->deleteOldFile($listingId);
       $uploadImage      = $request->file('listingImage')->storeAs('images', $imageFilename);
     }
 
-    // Check if files were uploaded
-    if ($uploadPdf || $uploadImage) {
-      $listing = Listing::findOrFail($id);
-      $listing->listing_name          = $request->input('listingName');
-      $listing->listing_name_slug     = str_slug($request->input('listingName'));
-      $listing->listing_description   = $request->input('listingDescription');
-      $listing->listing_price         = $request->input('listingPrice');
+    $listing = Listing::findOrFail($id);
+    $listing->listing_name          = $request->input('listingName');
+    $listing->listing_name_slug     = str_slug($request->input('listingName'));
+    $listing->listing_description   = $request->input('listingDescription');
+    $listing->listing_price         = $request->input('listingPrice');
+    $listing->listing_pdf           = $pdfFilename;
+    $listing->listing_image         = $imageFilename;
 
-      // Only assign new filename to table if uploaded file is new
-      if (Listing::findOrFail($id)->listing_pdf !== $pdfFilename) {
-        $listing->listing_pdf         = $pdfFilename;
-        $this->deleteOldImage($listingId);
-      }
+    $listing->saveOrFail();
 
-      if (Listing::findOrFail($id)->listing_image !== $imageFilename) {
-        $listing->listing_image         = $imageFilename;
-        $this->deleteOldFile($listingId);
-      }
-
-      $listing->saveOrFail();
-
-      return back()->with(['listingEdited' => 'Listing' . $request->input('listingName') . 'has been edited']);
-    }
+    return back()->with(['listingEdited' => 'Listing' . $request->input('listingName') . 'has been edited']);
   }
 
   public function deleteListings(Request $request)
   {
-    dd('stop');
     if (empty($request->input('ids'))) {
       return back()->with(['selectListing' => 'Select atleast one listing to delete']);
     }
