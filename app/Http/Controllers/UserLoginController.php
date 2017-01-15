@@ -5,13 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AdminLoginController extends Controller
+class UserLoginController extends Controller
 {
-  public function adminLoginView()
+  public function loginView()
   {
-    return view('admin/login');
+    return view('login');
   }
-
 
   // Validate request and login
   public function login(Request $request)
@@ -23,19 +22,20 @@ class AdminLoginController extends Controller
 
     $username = $request->input('username');
     $password = $request->input('password');
+    $remember = $request->input('remember');
 
-    if (Auth::attempt(['username' => $username, 'password' => $password])) {
-      return redirect()->intended('admin/admincp');
+    if (Auth::attempt(['username' => $username, 'password' => $password], $remember)) {
+      return redirect()->intended('/');
     }
-    return redirect('admin')->with(['loginFailed' => 'Wrong user or pass']);
-  }
 
+    return back()->with(['loginFailed' => 'Wrong user or pass']);
+  }
 
   // Logout and redirect back with message
   public function logout()
   {
     Auth::logout();
-    return redirect('admin')->with(['loggedOut' => 'You have been logged out']);
+    return redirect('/')->with(['loggedOut' => 'You have been logged out']);
   }
 
 }

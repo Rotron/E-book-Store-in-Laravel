@@ -8,7 +8,7 @@ class CreateTransactionsTable extends Migration
 {
   public function up()
   {
-   Schema::table('transactions', function (Blueprint $table) {
+   Schema::create('transactions', function (Blueprint $table) {
      $table->increments('id');
      $table->integer('listing_id')->unsigned();
      $table->foreign('listing_id')->references('id')->on('listings');
@@ -22,6 +22,6 @@ class CreateTransactionsTable extends Migration
 
   public function down()
   {
-    Schema:drop('transactions');
+    Schema::drop('transactions');
   }
 }

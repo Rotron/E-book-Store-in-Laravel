@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\RedirectGuest;
+use App\Http\Middleware\RedirectIfLoggedIn;
 
 // Get paid listings
 Route::get('/', 'ListingController@index');
@@ -11,25 +12,31 @@ Route::get('listings/free', 'ListingController@freeListings');
 Route::get('listing/{name}/{id}', 'ListingController@freeListing');
 
 // Admin login
-Route::get('admin', 'AdminLoginController@adminLoginView')->middleware('RedirectIfLoggedIn');
-Route::post('admin/login', 'AdminLoginController@login');
+Route::get('login', 'UserLoginController@LoginView')->middleware('redirectIfLoggedIn');
+Route::post('login', 'UserLoginController@login');
 
-Route::group(['middleware' => 'redirectGuest'], function(){
-  Route::get('admin/admincp', 'ListingController@admincp');
-  Route::get('admin/logout', 'AdminLoginController@logout');
+Route::get('register', 'UserRegistrationController@registerView');
+
+Route::post('register', function(Rrquest $request){
+  dd($request->all());
+});
+
+Route::group(['prefix' => 'admin', 'middleware' => array('redirectGuest', 'checkIfAdmin')], function(){
+  Route::get('admincp', 'ListingController@admincp');
+  Route::get('logout', 'AdminLoginController@logout');
 
   // Create a new listing
-  Route::get('admin/listing/new', 'ListingController@newListingView');
-  Route::post('admin/listing/new', 'ListingController@newListing');
+  Route::get('listing/new', 'ListingController@newListingView');
+  Route::post('listing/new', 'ListingController@newListing');
 
   // Edit a listing
-  Route::get('admin/listing/edit/{id}', 'ListingController@editListingView');
-  Route::patch('admin/listing/edit', 'ListingController@editListing');
+  Route::get('listing/edit/{id}', 'ListingController@editListingView');
+  Route::patch('listing/edit', 'ListingController@editListing');
 
   // Delete listings
-  Route::delete('admin/listing/delete', 'ListingController@deleteListings');
+  Route::delete('listing/delete', 'ListingController@deleteListings');
 
   // Change admin password
-  Route::get('admin/change-password', 'ChangeAdminPassword@changePasswordView');
-  Route::post('admin/change-password', 'ChangeAdminPassword@changePassword');
+  Route::get('change-password', 'ChangeAdminPassword@changePasswordView');
+  Route::post('change-password', 'ChangeAdminPassword@changePassword');
 });

@@ -15,5 +15,13 @@ class UsersTableSeeder extends Seeder
       'role' => 1,
       'remember_token' => '',
     ]);
+
+    DB::table('users')->insert([
+      'username' => 'verax',
+      'password' => Hash::make('verax'),
+      'email'   => 'phpdevsami@gmail.com',
+      'role' => 2,
+      'remember_token' => '',
+    ]);
   }
 }

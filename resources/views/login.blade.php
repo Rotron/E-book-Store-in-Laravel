@@ -4,8 +4,6 @@
 <div class="row">
 
   @section('content')
-
-  <h1> Login to Admin </h1>
     @if(session('loginFailed'))
       <div class="alert alert-warning col-md-12">
         {{session('loginFailed')}}
@@ -28,7 +26,7 @@
       </div>
     @endif
 
-    <form class="form-group" id="adminLogin" method="POST" action="admin/login">
+    <form class="form-group" id="adminLogin" method="POST" action="login">
       <div class="form-group">
         <label for="username">Username</label>
         <input name="username" placeholder="Username" class="form-control" type="text" id="adminUsername">
@@ -39,6 +37,10 @@
         <input name="password" placeholder="Password" class="form-control" type="password" id="adminPassword">
       </div>
 
+      <div class="form-group">
+        <label for="remember">Remember</label>
+        <input name="remember" type="checkbox" id="remember">
+      </div>
        {{ csrf_field() }}
 
        <input type="submit" value="Login" id="adminLogin" name="adminLogin" class="btn btn-primary">

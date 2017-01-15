@@ -16,17 +16,25 @@
   <form method="POST" action="/admin/listing/new" enctype="multipart/form-data">
     <div class="form-group">
       <label for="listingName">Listing Name</label>
-      <input id="listingName" class="form-control" type="text" name="listingName"> <br>
+      <input value="{{ old('listingName') }}" id="listingName" class="form-control" type="text" name="listingName"> <br>
+    </div>
+
+    <div class="form-group">
+      <label for="type"> Listing Type </label> <br>
+      <select class="selectpicker" name="listingType" id="type">
+         <option value="Free">Free</option>
+         <option value="Paid">Paid</option>
+      </select>
     </div>
 
     <div class="form-group">
       <label for="listingDescription">Listing Description</label>
-      <textarea rows="10" class="form-control" id="listingDescription" name="listingDescription"></textarea>
+      <textarea rows="10" class="form-control" id="listingDescription" name="listingDescription">{{ old('listingDescription') }}</textarea>
     </div>
 
     <div class="form-group">
       <label for="listingPrice">Price($)</label>
-      <input class="form-control" type="number" name="listingPrice" min="1" max="1000"> <br>
+      <input value="{{ old('listingPrice') }}" class="form-control" type="number" name="listingPrice" min="1" max="1000"> <br>
     </div>
 
     <div class="form-group">

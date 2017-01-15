@@ -19,3 +19,8 @@ h1
 {
   font-family: 'Droid Sans', sans-serif;
 }
+
+a
+{
+  color:grey !important;
+}

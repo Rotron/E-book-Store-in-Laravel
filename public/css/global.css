@@ -34,6 +34,11 @@ body, html
   color:white !important;
 }
 
+a
+{
+  color:grey !important;
+}
+
 #navbarHeading
 {
   color:white;

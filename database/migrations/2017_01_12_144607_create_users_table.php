@@ -12,7 +12,7 @@ class CreateUsersTable extends Migration
       $table->increments('id');
       $table->string('username');
       $table->string('email');
-      $table->string('role')->nullable();
+      $table->integer('role');
       $table->string('password');
       $table->string('remember_token')->nullable();
       $table->timestamps();
@@ -21,6 +21,6 @@ class CreateUsersTable extends Migration
 
   public function down()
   {
-      Schema::dropIfExists('users');
+      Schema::drop('users');
   }
 }

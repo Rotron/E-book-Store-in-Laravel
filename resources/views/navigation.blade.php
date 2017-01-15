@@ -14,6 +14,7 @@
         <li class="navbarStyle"><a href="/">Home</a></li>
         <li class="navbarStyle"><a href="/listings/free">Free e-books</a></li>
         <li class="navbarStyle"><a href="/contact">Contact</a></li>
+        <li class="navbarStyle"><a>Yo, {{ Auth::check() ? Auth::user()->username : 'Guest' }} </a></li>
       </ul>
     </div>
   </nav>
