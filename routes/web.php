@@ -3,13 +3,16 @@
 use App\Http\Middleware\RedirectGuest;
 use App\Http\Middleware\RedirectIfLoggedIn;
 
-// Get paid listings
+// Home. Get mixed listings..
 Route::get('/', 'ListingController@index');
-Route::get('listing/{name}/{id}', 'ListingController@listing');
+
+// Get paid listings
+Route::get('/listings/paid', 'ListingController@paidListings');
+Route::get('listing/paid/{name}/{id}', 'ListingController@paidListing');
 
 // Get free listings
 Route::get('listings/free', 'ListingController@freeListings');
-Route::get('listing/{name}/{id}', 'ListingController@freeListing');
+Route::get('listing/free/{name}/{id}', 'ListingController@freeListing');
 
 // Admin login
 Route::get('login', 'UserLoginController@LoginView')->middleware('redirectIfLoggedIn');

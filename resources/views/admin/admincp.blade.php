@@ -32,7 +32,7 @@
           @foreach($listings as $listing)
             <tr>
               <td> {{ strToUpper($listing->id) }} </td>
-              <td> <a href="/listing/{{$listing->listing_name_slug}}/{{ $listing->id }}"> {{ strToUpper($listing->listing_name) }} </td>
+              <td> <a href="/listing/{{$listing->type}}/{{$listing->listing_name_slug}}/{{ $listing->id }}"> {{ strToUpper($listing->listing_name) }} </td>
               <td> {{ substr($listing->listing_description, 0, 50) }} </td>
               <td> <a href="/admin/listing/edit/{{ $listing->id }}"> <button type="button" class="btn btn-info">Edit</button> </a> </td>
               <td> <input type="checkbox" name="ids[]" value="{{ $listing->id }}"> </td>

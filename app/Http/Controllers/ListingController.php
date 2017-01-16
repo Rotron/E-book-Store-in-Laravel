@@ -19,16 +19,38 @@ class ListingController extends Controller
     $this->request = $request;
   }
 
-  // Return collection of free listings..
-  public function freeListings()
+  // Return PAID listings..
+  public function paidListings()
   {
-    return view(['listings' => Listing::where('type', 'free')->paginate(10)]);
+    $listings = Listing::where('type', 'paid')->paginate(10);
+    return view('listings', ['listings' => $listings]);
   }
 
-  // Return listing by id
-  public function freeListing($id)
+  // Return FREE listings..
+  public function freeListings()
   {
-    return view(['listing' => Listing::find($id)->paginate(10)]);
+    $listings = Listing::where('type', 'free')->paginate(10);
+    return view('listings', ['listings' => $listings]);
+  }
+
+  // Expand PAID listing
+  public function paidListing($name, $id)
+  {
+    $listing = Listing::where(['type' => 'paid', 'id' => $id])->first();
+    return view('listing', ['listing' => $listing]);
+  }
+
+  // Expand FREE listing
+  public function freeListing($name, $id)
+  {
+    $listing = Listing::where(['type' => 'free', 'id' => $id]);
+    return view('listing', ['listing' => $listing]);
+  }
+
+  // Return all listing for admin dashboard
+  public function listings()
+  {
+    return view(['admin/admincp' => Listing::paginate(10)]);
   }
 
   // Listing admin home
@@ -37,10 +59,10 @@ class ListingController extends Controller
     return view('admin/admincp', ['listings' => Listing::paginate(10)]);
   }
 
-  // Return collectins of paid listings..
+  // Return both PAID and FREE ebooks
   public function index()
   {
-    return view('index', ['listings' => Listing::where('type', 'paid')->paginate(10)]);
+    return view('index', ['listings' => Listing::paginate(10)]);
   }
 
   // Return paid listing by id
@@ -96,32 +118,28 @@ class ListingController extends Controller
     }
 
     // Convert spaces to dash(-)
-    $pdfname = $this->addDashes('listingPdf');
+    $pdfName = $this->addDashes('listingPdf');
     $imageName = $this->addDashes('listingImage');
 
     // Upload new files, delete old file with same name..
-    if (Listing::where('listing_pdf', '!==', $pdfName) {
-      $this->deleteOldImage($listingId);
-      $uploadPdf        = $this->request->file('listingPdf')->storeAs('downloads', $pdfName);
-    }
+    $uploadPdf        = $this->request->file('listingPdf')->storeAs('downloads', $pdfName);
 
-    if (Listing::findOrFail($id)->listing_image !== $imageName) {
-      $this->deleteOldFile($listingId);
-      $uploadImage      = $this->request->file('listingImage')->storeAs('images', $imageName);
-    }
+    $uploadImage      = $this->request->file('listingImage')->storeAs('images', $imageName);
 
-    // Save info to database
+    if ($uploadPdf && $uploadImage) {
+      // Save info to database
       $listing = new Listing;
       $listing->listing_name        = $listingName;
       $listing->listing_name_slug   = $listingNameSlug;
       $listing->listing_description = $listingDescription;
       $listing->listing_price       = $listingPrice;
       $listing->type                = $listingType;
-      $listing->listing_pdf         = $pdfFilename;
-      $listing->listing_image       = $imageFilename;
+      $listing->listing_pdf         = $pdfName;
+      $listing->listing_image       = $imageName;
       $listing->saveOrFail();
-      return back()->with(['listingCreated' => 'Listing' . $request->input('listingName') . 'has been uploaded']);
 
+      return back()->with(['listingCreated' => 'Listing' . $request->input('listingName') . ' has been uploaded']);
+    }
     throw new exception('Files could not be uploaded');
 
   }
@@ -135,7 +153,7 @@ class ListingController extends Controller
   // Look for image by id in database, get its name and delete from storage.
   public function deleteOldImage($id)
   {
-    $imageNameById = Project::findOrFail($id)->listing_image();
+    $imageNameById = Listing::findOrFail($id)->listing_image;
 
     if (Storage::delete($imageNameById)) {
       return true;
@@ -147,7 +165,7 @@ class ListingController extends Controller
   // Look for file by id in database, get its name and delete from storage.
   public function deleteOldFile($id)
   {
-    $fileNamebyId = Project::findOrFail($id)->listing_pdf();
+    $fileNamebyId = Listing::findOrFail($id)->listing_pdf;
 
     if (Storage::delete($fileNamebyId)) {
       return true;
@@ -173,7 +191,10 @@ class ListingController extends Controller
   */
   public function editListing(Request $request)
   {
-    $listingId = $request->input('id');
+    $listing = Listing::findOrFail($id);
+    $id = $request->input('id');
+    $newPdfName = null;
+    $newImageName = null;
 
     $this->validate($request, [
       'listingName'         => 'required|max:50',
@@ -183,32 +204,57 @@ class ListingController extends Controller
       'listingImage'        => 'dimensions:height=150, width=150',
     ]);
 
+    // If file is uploaded add dashes to its name..
     if ($request->file('listingPdf')) {
-      $pdfname = $this->addDashes('listingPdf');
+      $newPdfName = $this->addDashes('listingPdf');
     }
 
     if ($request->file('listingImage')) {
-      $imageName = $this->addDashes('listingImage');
+      $newImageName = $this->addDashes('listingImage');
     }
 
-    if (Listing::findOrFail($id)->listing_pdf !== $pdfName) {
-      $this->deleteOldImage($listingId);
-      $uploadPdf        = $request->file('listingPdf')->storeAs('downloads', $pdfName);
+
+    // Make sure a file is uploaded..
+    if($newImageName != null) {
+
+      // Make sure uploaded file is a new file, match name with filename in storage
+      // This section needs changing. Check filename in storage instead of database.
+      if (!Listing::where(['id' => $id, 'listing_image' => $newImageName])) {
+
+        // Delete old file from storage
+        $this->deleteOldImage($id);
+
+        // Set new name in db
+        $listing->listing_image         = $imageName;
+
+        // Upload the new file
+        if (!$request->file('listingPdf')->storeAs('downloads', $newImageName)) {
+          throw new \Exception($newImageName . 'could not be uploaded');
+        }
+
+      }
+
     }
 
-    if (Listing::findOrFail($id)->listing_image !== $imageName) {
-      $this->deleteOldFile($listingId);
-      $uploadImage      = $request->file('listingImage')->storeAs('images', $imageFilename);
+    if ($newPdfName != null){
+
+      if (!Listing::where(['id' => $id, 'listing_image' => $newPdfName])) {
+
+        $this->deleteOldFile($id);
+        $listing->listing_pdf = $pdfName;
+
+        if (!$request->file('listingPdf')->storeAs('downloads', $newPdfName)) {
+          throw new \Exception($newPdfName . 'could not be uploaded');
+        }
+
+      }
+
     }
 
-    $listing = Listing::findOrFail($id);
     $listing->listing_name          = $request->input('listingName');
     $listing->listing_name_slug     = str_slug($request->input('listingName'));
     $listing->listing_description   = $request->input('listingDescription');
     $listing->listing_price         = $request->input('listingPrice');
-    $listing->listing_pdf           = $pdfFilename;
-    $listing->listing_image         = $imageFilename;
-
     $listing->saveOrFail();
 
     return back()->with(['listingEdited' => 'Listing' . $request->input('listingName') . 'has been edited']);

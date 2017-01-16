@@ -13,7 +13,7 @@
 <form method="POST" action="/admin/listing/edit" enctype="multipart/form-data">
 
   <input name="id" type="hidden" value="{{ $listing->id }}">
-  
+
   <div class="form-group">
     <label for="listingName">Listing Name</label>
     <input value="{{ $listing->listing_name }}" id="listingName" class="form-control" type="text" name="listingName">
@@ -36,7 +36,7 @@
 
   <div class="form-group">
     <label for="listingImage"> Upload Image - 150x150px </label> <br>
-      <img src="/{{ $listing->listing_image }}"> <br> <br>
+      <img src="/images/{{ $listing->listing_image }}"> <br> <br>
     <input id="listingImage" class="btn btn-default" type="file" name="listingImage" accept="image/*">
   </div>
 
