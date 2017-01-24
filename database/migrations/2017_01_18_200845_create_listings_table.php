@@ -12,7 +12,7 @@ class CreateListingsTable extends Migration
         $table->increments('id');
         $table->string('listing_name')->unique();
         $table->string('listing_name_slug')->unique();
-        $table->string('type');
+        $table->string('listing_type');
         $table->text('listing_description');
         $table->integer('listing_price');
         $table->string('listing_pdf');
@@ -23,6 +23,6 @@ class CreateListingsTable extends Migration
 
    public function down()
    {
-      Schema::drop('listings');
+      Schema::dropIfExists('listings');
    }
 }

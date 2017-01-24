@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Validator;
+use Schema;
 use \GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use App\Paypal\Paypal;
@@ -13,44 +14,55 @@ use App\Listing;
 class ListingController extends Controller
 {
 
+  private $requiredTables = array('users', 'listings', 'orders', 'order_sales');
+
   public function __construct(Request $request, Paypal $paypal)
   {
+    $this->checkTables();
     $this->paypal = $paypal;
     $this->request = $request;
+  }
+
+  // Check if required tables exist..
+  public function checkTables()
+  {
+    $errors = array();
+    foreach($this->requiredTables as $table) {
+      if(!Schema::hasTable($table)){
+        $errors[] = 'Table ' . $table . ' does not exists..';
+      }
+    }
+    if (!empty($errors)) {
+      dd($errors);
+    }
   }
 
   // Return PAID listings..
   public function paidListings()
   {
-    $listings = Listing::where('type', 'paid')->paginate(10);
+    $listings = Listing::where('listing_type', 'paid')->paginate(10);
     return view('listings', ['listings' => $listings]);
   }
 
   // Return FREE listings..
   public function freeListings()
   {
-    $listings = Listing::where('type', 'free')->paginate(10);
+    $listings = Listing::where('listing_type', 'free')->paginate(10);
     return view('listings', ['listings' => $listings]);
   }
 
   // Expand PAID listing
   public function paidListing($name, $id)
   {
-    $listing = Listing::where(['type' => 'paid', 'id' => $id])->first();
+    $listing = Listing::where(['listing_type' => 'paid', 'id' => $id])->first();
     return view('listing', ['listing' => $listing]);
   }
 
   // Expand FREE listing
   public function freeListing($name, $id)
   {
-    $listing = Listing::where(['type' => 'free', 'id' => $id]);
+    $listing = Listing::where(['listing_type' => 'free', 'id' => $id])->first();
     return view('listing', ['listing' => $listing]);
-  }
-
-  // Return all listing for admin dashboard
-  public function listings()
-  {
-    return view(['admin/admincp' => Listing::paginate(10)]);
   }
 
   // Listing admin home
@@ -59,7 +71,7 @@ class ListingController extends Controller
     return view('admin/admincp', ['listings' => Listing::paginate(10)]);
   }
 
-  // Return both PAID and FREE ebooks
+  // Return both PAID and FREE ebooks for homepage
   public function index()
   {
     return view('index', ['listings' => Listing::paginate(10)]);
@@ -68,7 +80,7 @@ class ListingController extends Controller
   // Return paid listing by id
   public function listing($name, $id)
   {
-    $listing =  Listing::where(['id' => $id, 'type' => 'paid'])->get();
+    $listing =  Listing::where(['id' => $id, 'listing_type' => 'paid'])->get();
     return view('listing', ['listing' => $listing]);
   }
 
@@ -98,14 +110,15 @@ class ListingController extends Controller
       'listingType.in' => 'Free and Paid are the only listing type accepted.',
       'listingPdf.required' => 'PDF file is missing in the upload',
       'listingImage.required' => 'Image file is missing. Please upload',
-      'listingImage.dimensions' => 'Make sure your image is exactly 150x150px'
+      'listingImage.dimensions' => 'Make sure your image is exactly 150x150px',
+      'listingPrice.required_if' => 'Please fill Price field. You have chosen Paid listing',
     ];
 
     $rules = [
       'listingName' => 'required|max:50',
       'listingType' => 'in:Free,Paid',
+      'listingPrice' => 'required_if:listingType,Paid|numeric|min:1',
       'listingDescription' => 'required',
-      'listingPrice' => 'required|numeric',
       'listingPdf' => 'required|file',
       'listingImage' => 'required|dimensions:height=150, width=150',
     ];
@@ -123,7 +136,6 @@ class ListingController extends Controller
 
     // Upload new files, delete old file with same name..
     $uploadPdf        = $this->request->file('listingPdf')->storeAs('downloads', $pdfName);
-
     $uploadImage      = $this->request->file('listingImage')->storeAs('images', $imageName);
 
     if ($uploadPdf && $uploadImage) {
@@ -132,8 +144,14 @@ class ListingController extends Controller
       $listing->listing_name        = $listingName;
       $listing->listing_name_slug   = $listingNameSlug;
       $listing->listing_description = $listingDescription;
+
+      if($listingType == 'Free') {
+        $listing->listing_price = 0;
+        $listing->listing_type = 'Free';
+      }
+
       $listing->listing_price       = $listingPrice;
-      $listing->type                = $listingType;
+      $listing->listing_type        = $listingType;
       $listing->listing_pdf         = $pdfName;
       $listing->listing_image       = $imageName;
       $listing->saveOrFail();
@@ -163,7 +181,7 @@ class ListingController extends Controller
   }
 
   // Look for file by id in database, get its name and delete from storage.
-  public function deleteOldFile($id)
+  public function deleteOldPdf($id)
   {
     $fileNamebyId = Listing::findOrFail($id)->listing_pdf;
 
@@ -181,28 +199,55 @@ class ListingController extends Controller
   }
 
 
+  // Check if uploaded file is new.
+  public function isNewFile($id, $check)
+  {
+    $entryExists = Listing::where([
+      'id' => $id,
+      "$check" => $check,
+    ])->first();
+
+    if(!$entryExists) {
+      return true;
+    }
+    return false;
+  }
+
   /**
   /* Validate the request.
   /* Replace spaces in file names with dashes.
   /* Upload the file with modified name.
-  /* If uploaded files are new(matched using file names in database and storage)
+  /* If uploaded files are new(matched using file names in database)
   /* then upload them and delete the old files associated with same listing.
   /* Assign values to database.
   */
   public function editListing(Request $request)
   {
-    $listing = Listing::findOrFail($id);
-    $id = $request->input('id');
-    $newPdfName = null;
+    $id           = $request->input('id');
+    $listing      = Listing::findOrFail($id);
+    $newPdfName   = null;
     $newImageName = null;
 
-    $this->validate($request, [
-      'listingName'         => 'required|max:50',
+    $rules = [
+      'listingName'         => 'required|max:100',
+      'listingType'         => 'in:Free,Paid',
+      'listingPrice'        => 'required_if:listingType,Paid|numeric|min:1',
       'listingDescription'  => 'required',
-      'listingPrice'        => 'required|numeric',
       'listingPdf'          => 'file',
       'listingImage'        => 'dimensions:height=150, width=150',
-    ]);
+    ];
+
+    $messages = [
+      'listingType.in' => 'Free and Paid are the only listing type accepted.',
+      'listingImage.dimensions' => 'Image size must be 150 x 150px',
+      'listingPrice.required_if' => 'Please fill Price field. You have chosen Paid listing',
+    ];
+
+    $validateResult = Validator::make($this->request->all(), $rules, $messages);
+
+    if ($validateResult->fails()) {
+      return redirect()->back()->withInput()->withErrors($validateResult);
+    }
 
     // If file is uploaded add dashes to its name..
     if ($request->file('listingPdf')) {
@@ -213,22 +258,20 @@ class ListingController extends Controller
       $newImageName = $this->addDashes('listingImage');
     }
 
-
     // Make sure a file is uploaded..
     if($newImageName != null) {
 
-      // Make sure uploaded file is a new file, match name with filename in storage
-      // This section needs changing. Check filename in storage instead of database.
-      if (!Listing::where(['id' => $id, 'listing_image' => $newImageName])) {
+      // Make sure uploaded file is a new.
+      if ($this->isNewFile($id, 'listing_image')) {
 
-        // Delete old file from storage
+        // Delete old file from storage associated with that listing
         $this->deleteOldImage($id);
 
         // Set new name in db
-        $listing->listing_image         = $imageName;
+        $listing->listing_image         = $newImageName;
 
         // Upload the new file
-        if (!$request->file('listingPdf')->storeAs('downloads', $newImageName)) {
+        if (!$request->file('listingImage')->storeAs('images', $newImageName)) {
           throw new \Exception($newImageName . 'could not be uploaded');
         }
 
@@ -238,10 +281,10 @@ class ListingController extends Controller
 
     if ($newPdfName != null){
 
-      if (!Listing::where(['id' => $id, 'listing_image' => $newPdfName])) {
+      if ($this->isNewFile($id, 'listing_pdf')) {
 
-        $this->deleteOldFile($id);
-        $listing->listing_pdf = $pdfName;
+        $this->deleteOldPdf($id);
+        $listing->listing_pdf = $newPdfName;
 
         if (!$request->file('listingPdf')->storeAs('downloads', $newPdfName)) {
           throw new \Exception($newPdfName . 'could not be uploaded');
@@ -251,22 +294,30 @@ class ListingController extends Controller
 
     }
 
-    $listing->listing_name          = $request->input('listingName');
-    $listing->listing_name_slug     = str_slug($request->input('listingName'));
-    $listing->listing_description   = $request->input('listingDescription');
-    $listing->listing_price         = $request->input('listingPrice');
+    $listing->listing_name          = $this->request->input('listingName');
+    $listing->type                  = $this->request->input('listingType');
+    $listing->listing_name_slug     = str_slug($this->request->input('listingName'));
+    $listing->listing_description   = $this->request->input('listingDescription');
+
+    if ($this->request->input('listingType') == 'Free') {
+      $listing->listing_price = 0;
+    } else {
+      $listing->listing_price         = $this->request->input('listingPrice');
+    }
+
     $listing->saveOrFail();
 
-    return back()->with(['listingEdited' => 'Listing' . $request->input('listingName') . 'has been edited']);
+    return back()->with(['listingEdited' => 'Listing' . $this->request->input('listingName') . ' has been edited']);
   }
 
-  public function deleteListings(Request $request)
+  /* Delete listing */
+  public function deleteListings()
   {
-    if (empty($request->input('ids'))) {
+    if (empty($this->request->input('ids'))) {
       return back()->with(['selectListing' => 'Select atleast one listing to delete']);
     }
 
-    $listings = Listing::whereIn('id', $request->input('ids'));
+    $listings = Listing::whereIn('id', $this->request->input('ids'));
 
     if ($listings->delete()) {
 

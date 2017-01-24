@@ -14,6 +14,8 @@ return [
 
     'name' => 'PDF MARKET - BUY PDFs',
 
+    'gcaptcha_secret' => env('GCAPTCHA_SECRET', 'secret'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

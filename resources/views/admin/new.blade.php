@@ -21,9 +21,9 @@
 
     <div class="form-group">
       <label for="type"> Listing Type </label> <br>
-      <select class="selectpicker" name="listingType" id="type">
+      <select onchange="hidePriceIfFree()" class="selectpicker" name="listingType" id="type">
          <option value="Free">Free</option>
-         <option value="Paid">Paid</option>
+         <option value="Paid" selected>Paid</option>
       </select>
     </div>
 
@@ -32,9 +32,9 @@
       <textarea rows="10" class="form-control" id="listingDescription" name="listingDescription">{{ old('listingDescription') }}</textarea>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" id="listingHideShow">
       <label for="listingPrice">Price($)</label>
-      <input value="{{ old('listingPrice') }}" class="form-control" type="number" name="listingPrice" min="1" max="1000"> <br>
+      <input id="listingPrice" value="{{ old('listingPrice') }}" class="form-control" type="number" name="listingPrice" min="1" max="1000"> <br>
     </div>
 
     <div class="form-group">
@@ -51,4 +51,17 @@
     <input class="btn btn-info" type="submit" value="Create Listing">
   </form>
 
+<script>
+
+  function hidePriceIfFree()
+  {
+    if($('#type').val() == 'Free') {
+      $('#listingHideShow').hide();
+    }
+
+    if($('#type').val() == 'Paid') {
+      $('#listingHideShow').show();
+    }
+  }
+</script>
 @endsection

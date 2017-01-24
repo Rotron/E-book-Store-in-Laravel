@@ -4,15 +4,10 @@
 <div class="row">
 
   @section('content')
-    @if(session('loginFailed'))
-      <div class="alert alert-warning col-md-12">
-        {{session('loginFailed')}}
-      </div>
-    @endif
 
-    @if(session('loggedOut'))
+    @if(session('notice'))
       <div class="alert alert-success col-md-12">
-        {{ session('loggedOut') }}
+        {{ session('notice') }}
       </div>
     @endif
 
@@ -25,11 +20,12 @@
         </ul>
       </div>
     @endif
-
+    
+    <h1> Login </h1>
     <form class="form-group" id="adminLogin" method="POST" action="login">
       <div class="form-group">
         <label for="username">Username</label>
-        <input name="username" placeholder="Username" class="form-control" type="text" id="adminUsername">
+        <input value="{{ old('username') }}" name="username" placeholder="Username" class="form-control" type="text" id="adminUsername">
       </div>
 
       <div class="form-group">
@@ -41,9 +37,10 @@
         <label for="remember">Remember</label>
         <input name="remember" type="checkbox" id="remember">
       </div>
+
        {{ csrf_field() }}
 
-       <input type="submit" value="Login" id="adminLogin" name="adminLogin" class="btn btn-primary">
+       <input type="submit" value="Login" id="adminLogin" name="login" class="btn btn-primary">
      </form>
 
   @endsection

@@ -173,7 +173,8 @@
     }
 
     // Make a call to sandbox, either from stream or from storage.
-    private function postToSandbox($data)
+    // This is used for testing only..
+    public function postToSandbox($data)
     {
       try {
           $resp = $this->guzzleClient->request('post', $url, [
@@ -212,14 +213,13 @@
     /* listener file. From there you can use storeData() method to store it.
     /* Make sure you disable the CSRF to your listener url.
     */
-    public function postSampleDataToListener()
+    public function postSampleDataToListener($listenerUrl, $sampleData)
     {
       try {
-        $resp = $this->guzzleClient->request('POST', $this->listenerUrl, [
-          'body' => $this->sampleData,
+        $resp = $this->guzzleClient->request('POST', $listenerUrl, [
+          'body' => $sampleData,
         ]);
         return true;
-
       } catch(RequestException $e) {
         echo Psr7\str($e->getRequest());
         echo Psr7\str($e->getResponse());
@@ -238,7 +238,7 @@
     }
 
     /**
-    /* Callback to Paypal's live server to verify transaction authenticity.
+    /* Live Callback to Paypal's live server to verify transaction authenticity.
     */
     public function liveCallback($request)
     {
@@ -300,37 +300,6 @@
       }
 
       return false;
-    }
-
-    /**
-    /* Store the transaction details.
-    /* If same user purchases SAME product more than ones,
-    /* which is checked using product_id and other info in transactions table.
-    /* Then update sold quantity column. If transaction is new,
-    /* then insert new record
-    */
-    public function storeTxn()
-    {
-      $transactions = new Transaction;
-      $firstName    = $request->input('first_name');
-      $lastName     = $request->input('last_name');
-      $payerEmail   = $request->input('payer_email');
-      $itemNumber   = $request->input('item_number');
-      $txnId        = $request->input('txn_id');
-      $listing      = Listing::find($itemNumber);
-
-      // Only insert if email doesn't exist.
-      if (!$listing->transactions->where('email', $payerEmail)->first()) {
-        $transaction->email       = $payerEmail;
-        $transaction->first_name  = $firstName;
-        $transaction->last_name   = $lastName;;
-      }
-
-      $listing->increment('total_sold');
-
-      $transaction->txn_id = $txnId;
-
-      $listing->transaction()->save($transaction);
     }
 
     // Generate download url for paid file

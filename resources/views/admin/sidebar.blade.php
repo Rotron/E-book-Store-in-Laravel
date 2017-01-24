@@ -10,7 +10,8 @@
   <div class="collapse navbar-collapse" id="myNavbar">
     <ul id="adminSidebarBody" class="nav navbar-nav" >
       <li> <a href="/admin/admincp"> Dashboard </a> </li>
-      <li> <a href="/admin/listing/new"> New </a> </li>
+      <li> <a href="/admin/listing/new"> New Listing </a> </li>
+      <li> <a href="/admin/users"> Users </a> </li>
       <li> <a href="/admin/logout"> Bye! </a> </li>
     </ul>
   </div>

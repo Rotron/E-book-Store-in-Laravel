@@ -8,6 +8,7 @@ class UsersTableSeeder extends Seeder
 
   public function run()
   {
+    // Admin
     DB::table('users')->insert([
       'username' => 'admin',
       'password' => Hash::make('admin'),
@@ -16,10 +17,12 @@ class UsersTableSeeder extends Seeder
       'remember_token' => '',
     ]);
 
+    // Sample user..
     DB::table('users')->insert([
-      'username' => 'verax',
-      'password' => Hash::make('verax'),
+      'username' => 'user',
+      'password' => Hash::make('123456'),
       'email'   => 'phpdevsami@gmail.com',
+      'confirmation_code' => '',
       'role' => 2,
       'remember_token' => '',
     ]);

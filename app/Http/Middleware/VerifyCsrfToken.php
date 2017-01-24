@@ -16,5 +16,6 @@ class VerifyCsrfToken extends BaseVerifier
       'fake-call',
       'postback',
       'listener',
+      'storeorder',
     ];
 }

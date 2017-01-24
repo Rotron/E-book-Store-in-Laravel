@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Login;
+use App\User;
 
 class UserLoginController extends Controller
 {
@@ -13,29 +15,28 @@ class UserLoginController extends Controller
   }
 
   // Validate request and login
-  public function login(Request $request)
+  public function login(Login $request)
   {
-    $this->validate($request, [
-      'username' => 'required',
-      'password' => 'required',
-    ]);
-
     $username = $request->input('username');
     $password = $request->input('password');
     $remember = $request->input('remember');
 
-    if (Auth::attempt(['username' => $username, 'password' => $password], $remember)) {
-      return redirect()->intended('/');
+    if(!Auth::attempt(['username' => $username, 'password' => $password], $remember)) {
+      return back()->withErrors('Account has not been confirmed.');
     }
 
-    return back()->with(['loginFailed' => 'Wrong user or pass']);
+    if (is_null(User::where('username', $username)->first()->confirmation_code)) {
+      return redirect()->intended('/');
+    }
+    
+    return back()->withErrors('Wrong user or pass.');
   }
 
   // Logout and redirect back with message
   public function logout()
   {
     Auth::logout();
-    return redirect('/')->with(['loggedOut' => 'You have been logged out']);
+    return redirect('/')->with(['notice' => 'You have been logged out']);
   }
 
 }

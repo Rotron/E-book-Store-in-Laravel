@@ -2,6 +2,17 @@
 
 use App\Http\Middleware\RedirectGuest;
 use App\Http\Middleware\RedirectIfLoggedIn;
+use App\Liting;
+
+use Faker\Generator as Faker;
+use App\Order;
+use App\User;
+use App\Listing;
+use App\OrderSale;
+
+Route::get('boom', function(User $obj){
+  dd($obj->find(1)->orders->first());
+});
 
 // Home. Get mixed listings..
 Route::get('/', 'ListingController@index');
@@ -14,14 +25,21 @@ Route::get('listing/paid/{name}/{id}', 'ListingController@paidListing');
 Route::get('listings/free', 'ListingController@freeListings');
 Route::get('listing/free/{name}/{id}', 'ListingController@freeListing');
 
-// Admin login
-Route::get('login', 'UserLoginController@LoginView')->middleware('redirectIfLoggedIn');
-Route::post('login', 'UserLoginController@login');
+// Login user
+Route::get('user/login', 'UserLoginController@LoginView')->name('/user/login')->middleware('redirectIfLoggedIn');
+Route::post('user/login', 'UserLoginController@login')->middleware('redirectIfLoggedIn');
+Route::get('user/logout', 'UserLoginController@logout')->middleware('redirectGuest');
 
-Route::get('register', 'UserRegistrationController@registerView');
+// Register user
+Route::group(['prefix' => 'user'], function(){
+  Route::get('/register', 'UserRegisterController@registerView')->middleware('redirectIfLoggedIn');
+  Route::post('/register', 'UserRegisterController@register')->middleware('redirectIfLoggedIn');
+  Route::get('/confirm/{username}/{confirmationCode}', 'UserRegisterController@confirm');
+});
 
-Route::post('register', function(Rrquest $request){
-  dd($request->all());
+// UserCP
+Route::group(['prefix' => 'user', 'middleware' => 'redirectGuest'], function(){
+  Route::get('usercp', 'UsercpController@index');
 });
 
 Route::group(['prefix' => 'admin', 'middleware' => array('redirectGuest', 'checkIfAdmin')], function(){
@@ -42,4 +60,16 @@ Route::group(['prefix' => 'admin', 'middleware' => array('redirectGuest', 'check
   // Change admin password
   Route::get('change-password', 'ChangeAdminPassword@changePasswordView');
   Route::post('change-password', 'ChangeAdminPassword@changePassword');
+
+  // All users
+  Route::get('users', 'ManageUserController@usersView');
+
+  Route::get('user/edit/{id}', 'ManageUserController@userEditView');
+  Route::patch('user/edit', 'ManageUserController@editUser');
+
+  Route::post('search', 'ManageUserController@searchUser');
 });
+
+
+Route::get('callback', 'OrderController@callback');
+Route::post('storeorder', 'OrderController@storeOrder');

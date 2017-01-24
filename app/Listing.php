@@ -6,8 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Listing extends Model
 {
-  public function transactions()
+
+  // Can be ordered multiple times, has many orders..
+  public function orders()
   {
-    $this->hasMany('App\Transaction');
+    return $this->hasMany('App\Order');
   }
+
 }

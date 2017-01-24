@@ -12,9 +12,28 @@
         <li class="navbarStyle"><a href="/">Home</a></li>
         <li class="navbarStyle"><a href="/listings/free">Free E-Books</a></li>
         <li class="navbarStyle"><a href="/listings/paid">Premium E-Books</a></li>
+
+        @if(Auth::guest())
+          <li class="navbarStyle"> <a href="/user/login">Login</a> </li>
+        @endif
+
+        @if (Auth::user() and Auth::user()->role == 1)
+          <li class="navbarStyle"> <a href="/admin/admincp">AdminCP</a> </li>
+        @endif
+
+        @if (Auth::user() and Auth::user()->role == 2)
+          <li class="navbarStyle"> <a href="/user/usercp">UserCP</a> </li>
+        @endif
+
+        @if (Auth::check())
+          <li class="navbarStyle"> <a href="/user/logout">Logout</a> </li>
+        @endif
+
+        @if (Auth::guest())
+          <li class="navbarStyle"> <a href="/user/register">Register</a> </li>
+        @endif
+
         <li class="navbarStyle"><a href="/contact">Contact</a></li>
-        <li class="navbarStyle"><a href="/admin/admincp">AdminCP</a></li>
-        <li class="navbarStyle"><a>Logged in as: {{ Auth::check() ? Auth::user()->username : 'Guest' }} </a></li>
       </ul>
     </div>
   </nav>

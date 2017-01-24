@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 use Closure;
 
+// Redirect guests to home..
 class RedirectGuest
 {
     public function handle($request, Closure $next)
