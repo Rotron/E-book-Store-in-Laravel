@@ -57,7 +57,7 @@ return [
 
     'from' => [
         'address' => '63edb4d7f5-3e5b6c@inbox.mailtrap.io',
-        'name' => '',
+        'name' => 'pdf market',
     ],
 
     /*
@@ -85,6 +85,7 @@ return [
     */
 
     'username' => env('MAIL_USERNAME'),
+
 
     /*
     |--------------------------------------------------------------------------

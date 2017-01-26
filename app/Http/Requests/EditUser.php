@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
-
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EditUser extends FormRequest
@@ -16,17 +16,15 @@ class EditUser extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
+    public function rules(Request $request)
     {
+      // $username = $request->route('user')->username;
+      $userId = $request->route('user')->id;
+
         return [
-          'username' => 'required|unique:users,username',
-          'email'   => 'required|unique:users,email',
-          'password' => 'required|min:10',
+          'username' => "required|unique:users,username,$userId,id",
+          'email'   => "required|unique:users,email,$userId,id",
+          'confirmed' => 'in:yes,no'
         ];
     }
 }

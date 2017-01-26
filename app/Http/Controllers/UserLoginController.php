@@ -21,15 +21,14 @@ class UserLoginController extends Controller
     $password = $request->input('password');
     $remember = $request->input('remember');
 
-    if(!Auth::attempt(['username' => $username, 'password' => $password], $remember)) {
-      return back()->withErrors('Account has not been confirmed.');
-    }
+    if(Auth::attempt(['username' => $username, 'password' => $password], $remember)) {
 
-    if (is_null(User::where('username', $username)->first()->confirmation_code)) {
-      return redirect()->intended('/');
+      if (is_null(User::where('username', $username)->first()->confirmation_code)) {
+        return redirect()->intended('/');
+      }
+      return back()->withErrors('Confirm account please');
     }
-    
-    return back()->withErrors('Wrong user or pass.');
+    return back()->withErrors('Wrong user or pass');
   }
 
   // Logout and redirect back with message

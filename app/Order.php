@@ -13,10 +13,9 @@ class Order extends Model
   }
 
   // Order made by particular user
-
-  // Order can have multiple sales..
-  public function orderSales()
+  public function user()
   {
-    return $this->hasMany('OrderSale');
+    return $this->belongsTo('App\User');
   }
+  
 }

@@ -14,7 +14,7 @@ use App\Listing;
 class ListingController extends Controller
 {
 
-  private $requiredTables = array('users', 'listings', 'orders', 'order_sales');
+  private $requiredTables = array('users', 'listings', 'orders');
 
   public function __construct(Request $request, Paypal $paypal)
   {

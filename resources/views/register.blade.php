@@ -38,7 +38,7 @@
     </div>
 
     {{ csrf_field() }}
-    <div class="g-recaptcha" data-sitekey="6LcNyg8UAAAAALqZnUa7lW2JxtG81OGHQm9_kE9G"></div>
+    <div class="g-recaptcha" data-sitekey="{{ config('app.gcaptcha_public') }}"></div>
     <input class="btn btn-info" type="submit" value="Register">
   </form>
 @endsection

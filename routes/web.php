@@ -9,10 +9,8 @@ use App\Order;
 use App\User;
 use App\Listing;
 use App\OrderSale;
+use App\Paypal\Paypal;
 
-Route::get('boom', function(User $obj){
-  dd($obj->find(1)->orders->first());
-});
 
 // Home. Get mixed listings..
 Route::get('/', 'ListingController@index');
@@ -65,11 +63,13 @@ Route::group(['prefix' => 'admin', 'middleware' => array('redirectGuest', 'check
   Route::get('users', 'ManageUserController@usersView');
 
   Route::get('user/edit/{id}', 'ManageUserController@userEditView');
-  Route::patch('user/edit', 'ManageUserController@editUser');
+  Route::patch('user/edit/{user}', 'ManageUserController@editUser');
 
   Route::post('search', 'ManageUserController@searchUser');
 });
 
+Route::get('contact', 'ContactAdminController@contactView');
+Route::post('send-mail', 'ContactAdminController@validateContactForm');
 
 Route::get('callback', 'OrderController@callback');
 Route::post('storeorder', 'OrderController@storeOrder');
