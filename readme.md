@@ -6,7 +6,7 @@ Work in progress..
 
 * Registration/login
 
-* Adding/updating listing
+* Adding/Updating/Deleting listing
 
 * Editing user
 
