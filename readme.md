@@ -1,7 +1,9 @@
 # Mini E-book Store #
+**Sell or put them out for free**
 Work in progress..
 
-Done:
+**Done:**
+
 * Registration/login
 
 * Adding/updating listing
