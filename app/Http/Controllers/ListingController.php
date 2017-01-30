@@ -10,6 +10,8 @@ use \GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use App\Paypal\Paypal;
 use App\Listing;
+use App\User;
+use Auth;
 
 class ListingController extends Controller
 {
@@ -51,11 +53,15 @@ class ListingController extends Controller
     return view('listings', ['listings' => $listings]);
   }
 
-  // Expand PAID listing
+  // Expand PAID listing.
   public function paidListing($name, $id)
   {
+    if(Auth::user() != null) {
+      $alreadyPurchased = Auth::user()->orders->where('listing_id', $id)->first();
+    }
+
     $listing = Listing::where(['listing_type' => 'paid', 'id' => $id])->first();
-    return view('listing', ['listing' => $listing]);
+    return view('listing', compact('listing', 'alreadyPurchased'));
   }
 
   // Expand FREE listing
@@ -115,7 +121,7 @@ class ListingController extends Controller
     ];
 
     $rules = [
-      'listingName' => 'required|max:50',
+      'listingName' => 'required|max:100',
       'listingType' => 'in:Free,Paid',
       'listingPrice' => 'required_if:listingType,Paid|numeric|min:1',
       'listingDescription' => 'required',

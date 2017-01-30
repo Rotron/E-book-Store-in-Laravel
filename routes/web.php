@@ -4,14 +4,14 @@ use App\Http\Middleware\RedirectGuest;
 use App\Http\Middleware\RedirectIfLoggedIn;
 use App\Liting;
 
+use Illuminate\Http\Request;
+
 use Faker\Generator as Faker;
 use App\Order;
 use App\User;
 use App\Listing;
 use App\OrderSale;
 use App\Paypal\Paypal;
-
-
 // Home. Get mixed listings..
 Route::get('/', 'ListingController@index');
 
@@ -69,7 +69,16 @@ Route::group(['prefix' => 'admin', 'middleware' => array('redirectGuest', 'check
 });
 
 Route::get('contact', 'ContactAdminController@contactView');
-Route::post('send-mail', 'ContactAdminController@validateContactForm');
+Route::post('send-mail', 'ContactAdminController@validateAdminContact');
 
-Route::get('callback', 'OrderController@callback');
+Route::post('callback-paypal', 'OrderController@callbackPaypal');
+
+
+
+Route::get('test', function(){
+  $user = app()->make('request');
+  dd($user->user());
+  dd(get_class(request()));
+});
+
 Route::post('storeorder', 'OrderController@storeOrder');

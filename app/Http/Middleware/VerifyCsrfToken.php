@@ -12,7 +12,7 @@ class VerifyCsrfToken extends BaseVerifier
      * @var array
      */
     protected $except = [
-      'callback',
+      'callback-paypal',
       'fake-call',
       'postback',
       'listener',

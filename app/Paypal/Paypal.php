@@ -172,18 +172,22 @@
 
     }
 
+
     // Make a call to sandbox, either from stream or from storage.
     // This is used for testing only..
     public function postToSandbox($data)
     {
       try {
-          $resp = $this->guzzleClient->request('post', $url, [
-            'query' => $data
-          ]);
-          return $resp->getBody()->getContents();
+        $resp = $this->guzzleClient->request('post', 'https://www.sandbox.paypal.com/cgi-bin/webscr', [
+          'query' => $data
+        ]);
       } catch( RequestException $e) {
         echo Psr7\str($e->getRequest());
         echo Psr7\str($e->getResponse());
+      }
+
+      if ($resp->getBody()->getContents() != 'VERIFIED') {
+        throw new \Exception('Your call to paypal sandbox returned Invalid');
       }
     }
 
@@ -240,7 +244,7 @@
     /**
     /* Live Callback to Paypal's live server to verify transaction authenticity.
     */
-    public function liveCallback($request)
+    public function liveCallback()
     {
       self::checkStream();
 
@@ -253,7 +257,9 @@
       ]);
 
       // Return the response
-      return $response->getBody()->getContents();
+      if ($response->getBody()->getContents() != 'VERIFIED') {
+        throw new \Exception('Transaction is not Verified');
+      }
     }
 
     /**

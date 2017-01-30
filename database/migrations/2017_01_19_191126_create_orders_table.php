@@ -18,6 +18,7 @@ class CreateOrdersTable extends Migration
      $table->string('first_name');
      $table->string('last_name');
      $table->string('payer_email');
+     $table->string('status');
      $table->timestamps();
    });
   }

@@ -5,47 +5,101 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Paypal\Paypal;
 use App\Order;
+use App\Listing;
 
 class OrderController extends Controller
 {
-
-  public function callback(Paypal $paypal, Request $request)
+  public function __construct(Paypal $paypal, Request $request)
   {
-  // $paypal->postSampleDataToListener('http://996b2801.ngrok.io/storeorder', 'mc_gross=19.95&protection_eligibility=Eligible&address_status=confirmed&payer_email=sami&payer_id=LPLWNMTBWMFAY&tax=0.00&address_street=1+Main+St&payment_date=20%3A12%3A59+Jan+13%2C+2009+PST&payment_status=Completed&charset=windows-1252&address_zip=95131&first_name=Test&mc_fee=0.88&address_country_code=US&address_name=Test+User&notify_version=2.6&custom=&payer_status=verified&address_country=United+States&address_city=San+Jose&quantity=1&verify_sign=AtkOfCXbDm2hu0ZELryHFjY-Vb7PAUvS6nMXgysbElEn9v-1XcmSoGtf&payer_email=gpmac_1231902590_per%40paypal.com&txn_id=61E67681CH3238416&payment_type=instant&last_name=User&address_state=CA&receiver_email=gpmac_1231902686_biz%40paypal.com&payment_fee=0.88&receiver_id=S8XGHLYDW9T3S&txn_type=express_checkout&item_name=&mc_currency=USD&item_number=&residence_country=US&test_ipn=1&handling_amount=0.00&transaction_subject=&payment_gross=19.95&shipping=0.00');
-  //  $this->storeOrder($request);
+
+    // Test it, its half way through..  put payment_Status value in db regardless of value..
+    // When redirecting to download link make sure user has paid for the item and
+    // Payment is verified.
+    $this->firstName      = $request->input('first_name');
+    $this->lastName       = $request->input('last_name');
+    $this->payerEmail     = $request->input('payer_email');
+    $this->receiverEmail  = $request->input('receiver_email');
+    $this->itemNumber     = $request->input('item_number');
+    $this->price          = $request->input('mc_gross');
+    $this->userId         = $request->input('custom');
+    $this->txnId          = $request->input('txn_id');
+    $this->status         = $request->input('payment_status');
+    $this->request        = $request;
+    $this->paypal         = $paypal;
   }
 
-  // Make sure txn_id doesn't exist in database, if it does, its duplicate POST
-  // Make sure item user paid for matches its price
-  public function matchPrice($itemNumber, $price)
+  // Make callback to paypal
+  public function callbackPaypal()
   {
-    if (Order::where('txn_id', $txnId)->first() == null) {
-      Listing::where(['id' => $itemNumber, 'listing_price' => $price])->firstOrFail();
+    $data = $this->paypal->formatDataCentral('stream');
+    $this->paypal->postToSandbox($data);
+    $this->paidToRightEmail();
+    $this->alreadyPurchased();
+    $this->matchPrice();
+    $this->checkIfDuplicateTxn();
+    $this->storeOrder();
+  }
+
+  /**
+  /* If a user is not logged in they wont be able to make purchase, but if somehow
+  /* they try purchasing the same item again they will stop the payment from
+  /* going through
+  */
+  public function alreadyPurchased()
+  {
+    if (Auth::user()->orders()->where('listing_id', $this->itemNumber) != null) {
+      throw new \Exception('User tried to purchase same product again');
+    }
+  }
+
+  /**
+  /* Make sure user pays right amount for right item.
+  /* returns exception if wrong price for wrong item..
+  */
+  public function matchPrice()
+  {
+    if (Listing::where(['id' => $this->itemNumber, 'listing_price' => $this->price]) == null) {
+      throw new \Exception('User paid wrong amount for the item');
+    }
+  }
+
+
+  /**
+  /* txn_id cant already be in database, if it's there
+  /* it means it's duplicate transaction
+  /* @returns true/false
+  */
+  public function checkIfDuplicateTxn()
+  {
+    if (Order::where('txn_id', $this->txnId)->first() != null) {
+      throw new \Exception('Transaction ID already exists in database, duplicate transaction');
+    }
+  }
+
+
+  /**
+  /* Make sure user sent the money to your email defined in .env file
+  */
+  public function paidToRightEmail()
+  {
+    if( config('app.paypal_email') != $this->receiverEmail) {
+      throw new \Exception('Payment was made to wrong email' . $this->receiverEmail);
     }
   }
 
   // Store data from paypals callback
-  public function storeOrder(Paypal $paypal, Request $request)
+  public function storeOrder()
   {
-    $data         = $paypal->formatDataCentral('stream');
+    $order              = new Order;
+    $order->payer_email = $this->payerEmail;
+    $order->first_name  = $this->firstName;
+    $order->last_name   = $this->lastName;
+    $order->listing_id  = $this->itemNumber;
+    $order->txn_id      = $this->txnId;
+    $order->status      = $this->status;
+    $order->user_id     = $this->userId;
 
-    if ($payapl->postToSandbox($data) !== 'Verified') {
-      throw new \Exception('Invalid payment, paypal returned failed');
-    }
-
-    $order        = new Order;
-    $firstName    = $request->input('first_name');
-    $lastName     = $request->input('last_name');
-    $payerEmail   = $request->input('payer_email');
-    $itemNumber   = $request->input('item_number');
-    $userId       = $request->input('user_id');
-    $txnId        = $request->input('txn_id');
-
-    $order->payer_email = $payerEmail;
-    $order->first_name  = $firstName;
-    $order->last_name   = $lastName;
-    $order->listing_id  = $itemNumber;
-    $order->txn_id      = $txnId;
     $order->saveOrFail();
+
   }
 }

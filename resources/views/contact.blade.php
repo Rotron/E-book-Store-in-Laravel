@@ -5,7 +5,7 @@
   <script src='https://www.google.com/recaptcha/api.js'></script>
 
   <fieldset>
-    @if(count($errors) > 1)
+    @if(count($errors) > 0)
       <div class="alert alert-warning">
         <ul>
           @foreach($errors->all() as $error)

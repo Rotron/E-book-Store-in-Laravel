@@ -16,6 +16,7 @@ return [
 
     'gcaptcha_secret' => env('GCAPTCHA_SECRET', 'secret'),
     'gcaptcha_public' => env('GCAPTCHA_PUBLIC', 'secret'),
+    'paypal_email' => env('PAYPAL_EMAIL'),
 
     /*
     |--------------------------------------------------------------------------
