@@ -42,14 +42,14 @@ class ListingController extends Controller
   // Return PAID listings..
   public function paidListings()
   {
-    $listings = Listing::where('listing_type', 'paid')->paginate(10);
+    $listings = Listing::where('listing_price', '>', 0)->paginate(10);
     return view('listings', ['listings' => $listings]);
   }
 
   // Return FREE listings..
   public function freeListings()
   {
-    $listings = Listing::where('listing_type', 'free')->paginate(10);
+    $listings = Listing::where('listing_price', '<=', 0)->paginate(10);
     return view('listings', ['listings' => $listings]);
   }
 
@@ -57,10 +57,10 @@ class ListingController extends Controller
   public function paidListing(string $name, int $id)
   {
     if(Auth::user() != null) {
-      $alreadyPurchased = Auth::user()->orders->where('listing_id', $id);
+      $alreadyPurchased = Auth::user()->orders()->where('listing_id', $id)->get();
     }
 
-    $listing = Listing::where(['listing_type' => 'paid', 'id' => $id])->first();
+    $listing = Listing::where('listing_price', '>', 0)->where('id', $id)->first();
 
     return view('listing', compact('listing', 'alreadyPurchased'));
   }
@@ -68,7 +68,7 @@ class ListingController extends Controller
   // Expand FREE listing
   public function freeListing($name, $id)
   {
-    $listing = Listing::where(['listing_type' => 'free', 'id' => $id])->first();
+    $listing = Listing::where('listing_price', '<=', 0)->where('id', $id)->first();
     return view('listing', ['listing' => $listing]);
   }
 
@@ -124,7 +124,7 @@ class ListingController extends Controller
     $rules = [
       'listingName' => 'required|max:100',
       'listingType' => 'in:Free,Paid',
-      'listingPrice' => 'required_if:listingType,Paid|numeric|min:1',
+      // 'listingPrice' => 'required_if:listingType,Paid|numeric|min:1',
       'listingDescription' => 'required',
       'listingPdf' => 'required|file',
       'listingImage' => 'required|dimensions:height=150, width=150',
