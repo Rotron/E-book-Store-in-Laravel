@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Paypal\Paypal;
 use App\Order;
 use App\Listing;
+use Auth;
 
 class OrderController extends Controller
 {

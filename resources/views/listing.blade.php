@@ -10,12 +10,12 @@
       <img src="/images/{{ $listing->listing_image }}">
     </div>
 
-
     <div class="col-md-6">
       {{ $listing->listing_description }}
         @if($listing->listing_type == 'Paid')
           @if(Auth::user())
-            @if($listing->alreadyPurchased == null)
+
+            @if($alreadyPurchased == null)
               <form action="https://www.sandbox.paypal.com/webscr" method="post">
                 <input type="hidden" name="cmd" value="_xclick">
                 <input type="hidden" name="business" value="seosatanforum-facilitator@gmail.com">
@@ -29,7 +29,7 @@
                 alt="Buy Now" />
               </form>
             @else
-              Seems like you have already purchased this PDF. Check <a href="/user/usercp">UserCP</a> to download.
+              <br> <br> Seems like you have already purchased this PDF. <br> Check <a href="/user/usercp">UserCP</a> to download.
             @endif
           @else
             <br> Please<a href="/user/login"> login </a> or <a href="/user/register"> register </a> to purchase this product
