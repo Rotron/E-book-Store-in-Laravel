@@ -19,7 +19,9 @@ class DownloadController extends Controller
     }
 
     // Paid listing
-    if (Auth::user()->orders()->where('listing_id', $id)->first()->status == 'Completed') {
+    $order = Auth::user()->orders()->where('listing_id', 2)->first();
+
+    if (($order->status == 'Completed') && ((double) $order->mc_gross == (double) $order->listing->listing_price)) {
         return response()->download(storage_path() . '/app/downloads/' . $listing->listing_pdf);
     }
 

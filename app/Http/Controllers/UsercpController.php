@@ -25,8 +25,6 @@ class UsercpController extends Controller
     // Orders made by user
     $userOrders = Auth::user()->orders()->paginate();
 
-    // dd($userOrders);
-
     // Get listings thatmatch orders
     // $userOrderListings = Listing::wherein('id', $userOrders)->get();
 
