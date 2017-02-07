@@ -12,12 +12,11 @@ class CreateListingsTable extends Migration
         $table->increments('id');
         $table->string('listing_name')->unique();
         $table->string('listing_name_slug')->unique();
-        $table->string('listing_type');
         $table->string('deleted_at')->nullable();
         $table->text('listing_description');
-        $table->integer('listing_price');
+        $table->decimal('listing_price');
         $table->string('listing_pdf');
-        $table->string('listing_image');
+        $table->string('listing_image')->nullable();
         $table->timestamps();
       });
     }

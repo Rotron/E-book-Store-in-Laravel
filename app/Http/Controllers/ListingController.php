@@ -107,18 +107,19 @@ class ListingController extends Controller
   /* Create new listing */
   public function newListing(Request $request)
   {
+    $imageName = null;
     $listingName        = $this->request->input('listingName');
     $listingNameSlug    = str_slug($listingName, '-');
     $listingDescription = $this->request->input('listingDescription');
     $listingPrice       = $this->request->input('listingPrice');
-    $listingType        = $this->request->input('listingType');
+    // $listingType        = $this->request->input('listingType');
 
     $messages = [
       'listingType.in' => 'Free and Paid are the only listing type accepted.',
       'listingPdf.required' => 'PDF file is missing in the upload',
       'listingImage.required' => 'Image file is missing. Please upload',
       'listingImage.dimensions' => 'Make sure your image is exactly 150x150px',
-      'listingPrice.required_if' => 'Please fill Price field. You have chosen Paid listing',
+      // 'listingPrice.required_if' => 'Please fill Price field. You have chosen Paid listing',
     ];
 
     $rules = [
@@ -127,7 +128,7 @@ class ListingController extends Controller
       // 'listingPrice' => 'required_if:listingType,Paid|numeric|min:1',
       'listingDescription' => 'required',
       'listingPdf' => 'required|file',
-      'listingImage' => 'required|dimensions:height=150, width=150',
+      'listingImage' => 'dimensions:height=150,width=150',
     ];
 
     // Validate the form
@@ -139,26 +140,26 @@ class ListingController extends Controller
 
     // Convert spaces to dash(-)
     $pdfName = $this->addDashes('listingPdf');
-    $imageName = $this->addDashes('listingImage');
+
+    if ($this->request->file('listingImage')) {
+      $imageName        = $this->addDashes('listingImage');
+      $uploadImage      = $this->request->file('listingImage')->storeAs('images', $imageName);
+    }
 
     // Upload new files, delete old file with same name..
     $uploadPdf        = $this->request->file('listingPdf')->storeAs('downloads', $pdfName);
-    $uploadImage      = $this->request->file('listingImage')->storeAs('images', $imageName);
 
-    if ($uploadPdf && $uploadImage) {
+    if ($uploadPdf) {
       // Save info to database
       $listing = new Listing;
       $listing->listing_name        = $listingName;
       $listing->listing_name_slug   = $listingNameSlug;
       $listing->listing_description = $listingDescription;
 
-      if($listingType == 'Free') {
-        $listing->listing_price = 0;
-        $listing->listing_type = 'Free';
-      }
+      $listing->listing_price = 0;
 
       $listing->listing_price       = $listingPrice;
-      $listing->listing_type        = $listingType;
+      // $listing->listing_type        = $listingType;
       $listing->listing_pdf         = $pdfName;
       $listing->listing_image       = $imageName;
       $listing->saveOrFail();
@@ -237,7 +238,6 @@ class ListingController extends Controller
 
     $rules = [
       'listingName'         => 'required|max:100',
-      'listingType'         => 'in:Free,Paid',
       'listingPrice'        => 'required_if:listingType,Paid|numeric|min:1',
       'listingDescription'  => 'required',
       'listingPdf'          => 'file',
@@ -245,7 +245,6 @@ class ListingController extends Controller
     ];
 
     $messages = [
-      'listingType.in' => 'Free and Paid are the only listing type accepted.',
       'listingImage.dimensions' => 'Image size must be 150 x 150px',
       'listingPrice.required_if' => 'Please fill Price field. You have chosen Paid listing',
     ];
@@ -302,15 +301,10 @@ class ListingController extends Controller
     }
 
     $listing->listing_name          = $this->request->input('listingName');
-    $listing->type                  = $this->request->input('listingType');
     $listing->listing_name_slug     = str_slug($this->request->input('listingName'));
     $listing->listing_description   = $this->request->input('listingDescription');
 
-    if ($this->request->input('listingType') == 'Free') {
-      $listing->listing_price = 0;
-    } else {
-      $listing->listing_price         = $this->request->input('listingPrice');
-    }
+    $listing->listing_price         = $this->request->input('listingPrice');
 
     $listing->saveOrFail();
 

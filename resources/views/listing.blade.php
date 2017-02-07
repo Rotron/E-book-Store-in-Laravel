@@ -7,13 +7,16 @@
     </div>
 
     <div class="col-md-2">
-      <img src="/images/{{ $listing->listing_image }}">
+      @if($listing->listing_image != null)
+        <img src="/images/{{ $listing->listing_image  }}"> <br>
+      @else
+        <img src="/default.png"> <br>
+      @endif
     </div>
 
     <div class="col-md-6">
       {{ $listing->listing_description }} <br>
-      <a href="">Download</a>
-        @if($listing->listing_price > 0)
+        @if($listing->listing_price >= 1)
           @if(Auth::user())
             @if(count($alreadyPurchased) <= 0)
               <form action="https://www.sandbox.paypal.com/webscr" method="post">
@@ -34,6 +37,8 @@
           @else
             <br> Please<a href="/user/login"> login </a> or <a href="/user/register"> register </a> to purchase this product
           @endif
+        @else
+          <a href="/listing/download/{{ $listing->id }}">Download</a>
         @endif
     </div>
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Listing extends Model
 {
   use SoftDeletes;
+  
   protected $dates = ['deleted_at'];
 
   // Can be ordered multiple times, has many orders..

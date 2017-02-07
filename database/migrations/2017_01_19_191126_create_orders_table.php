@@ -13,7 +13,7 @@ class CreateOrdersTable extends Migration
 
      $table->integer('user_id');
      $table->integer('listing_id');
-
+     $table->decimal('mc_gross');
      $table->string('txn_id');
      $table->string('first_name');
      $table->string('last_name');

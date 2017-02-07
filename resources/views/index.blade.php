@@ -18,7 +18,13 @@
         <div class="col-md-12">
         @foreach($chunk as $listing)
           <div class="verticalGap col-md-2"  style="margin-left:10px; border:1px dashed grey; padding:20px;">
-            <img src="/images/{{ $listing->listing_image }}"> <br>
+
+            @if($listing->listing_image != null)
+              <img src="/images/{{ $listing->listing_image  }}"> <br>
+            @else
+              <img src="/default.png"> <br>
+            @endif
+
             <hr>
             <a href="/listing/{{ ($listing->listing_price <= 0) ? 'free' : 'paid' }}/{{$listing->listing_name_slug}}/{{$listing->id}}">
               <b> {{ $listing->listing_name }} </b>

@@ -20,14 +20,6 @@
     </div>
 
     <div class="form-group">
-      <label for="type"> Listing Type </label> <br>
-      <select onchange="hidePriceIfFree()" class="selectpicker" name="listingType" id="type">
-         <option value="Free">Free</option>
-         <option value="Paid" selected>Paid</option>
-      </select>
-    </div>
-
-    <div class="form-group">
       <label for="listingDescription">Listing Description</label>
       <textarea rows="10" class="form-control" id="listingDescription" name="listingDescription">{{ old('listingDescription') }}</textarea>
     </div>
@@ -52,7 +44,7 @@
   </form>
 
 <script>
-
+/*
   function hidePriceIfFree()
   {
     if($('#type').val() == 'Free') {
@@ -63,5 +55,6 @@
       $('#listingHideShow').show();
     }
   }
+  */
 </script>
 @endsection

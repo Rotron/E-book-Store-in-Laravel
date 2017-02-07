@@ -73,12 +73,8 @@ Route::post('send-mail', 'ContactAdminController@validateAdminContact');
 
 Route::post('callback-paypal', 'OrderController@callbackPaypal');
 
+Route::get('listing/download/{id}', 'DownloadController@download');
 
-
-Route::get('test', function(){
-  $user = app()->make('request');
-  dd($user->user());
-  dd(get_class(request()));
-});
+Route::get('test/{id}', 'OrderController@alreadyPurchased');
 
 Route::post('storeorder', 'OrderController@storeOrder');

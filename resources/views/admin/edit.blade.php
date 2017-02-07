@@ -21,14 +21,6 @@
   </div>
 
   <div class="form-group">
-    <label for="type"> Listing Type </label> <br>
-    <select class="selectpicker" name="listingType" id="type">
-      <option value="Free" @if(old('listingType') or $listing->type == 'Free') {{'selected'}} @endif>Free</option>
-      <option value="Paid" @if(old('listingType') or $listing->type == 'Paid') {{'selected'}} @endif>Paid</option>
-    </select>
-  </div>
-
-  <div class="form-group">
     <label for="listingDescription">Listing Description</label>
     <textarea rows="10" class="form-control" id="listingDescription" name="listingDescription">{{$listing->listing_description}}</textarea>
   </div>
@@ -44,8 +36,12 @@
   </div>
 
   <div class="form-group">
-    <label for="listingImage"> Upload Image - 150x150px (Current: {{ $listing->listing_image }}) </label> <br>
-      <img src="/images/{{ $listing->listing_image }}"> <br> <br>
+    <label for="listingImage"> Upload Image - 150x150px (Current: {{ $listing->listing_image ?: 'default.png' }}) </label> <br>
+    @if($listing->listing_image != null)
+      <img src="/images/{{ $listing->listing_image  }}"> <br>
+    @else
+      <img src="/default.png"> <br>
+    @endif
     <input id="listingImage" class="btn btn-default" type="file" name="listingImage" accept="image/*">
   </div>
 
