@@ -37,8 +37,8 @@ class OrderController extends Controller
   }
 
   /**
-  /* Make sure user pays right amount for right item.
-  /* returns exception if wrong price for wrong item..
+  * Make sure user pays right amount for right item.
+  * returns exception if wrong price for wrong item..
   */
   public function matchPrice()
   {
@@ -49,9 +49,9 @@ class OrderController extends Controller
 
 
   /**
-  /* txn_id cant already be in database, if it's there
-  /* it means it's duplicate transaction
-  /* @returns true/false
+  * txn_id cant already be in database, if it's there
+  * it means it's duplicate transaction
+  * @returns true/false
   */
   public function checkIfDuplicateTxn()
   {
@@ -62,7 +62,7 @@ class OrderController extends Controller
 
 
   /**
-  /* Make sure user sent the money to your email defined in .env file
+  * Make sure user sent the money to your email defined in .env file
   */
   public function paidToRightEmail()
   {

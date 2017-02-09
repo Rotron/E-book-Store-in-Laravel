@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Auth;
 use App\Listing;
 
-class DownloadController extends Controller
+class LoginController extends Controllers
 {
   // Download files from storage folder
   public function download(int $id)
@@ -19,7 +19,7 @@ class DownloadController extends Controller
     }
 
     // Paid listing
-    $order = Auth::user()->orders()->where('listing_id', 2)->first();
+    $order = Auth::user()->orders()->where('listing_id', $id)->first();
 
     if (($order->status == 'Completed') && ((double) $order->mc_gross == (double) $order->listing->listing_price)) {
         return response()->download(storage_path() . '/app/downloads/' . $listing->listing_pdf);

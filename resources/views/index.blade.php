@@ -9,7 +9,7 @@
           <div class="alert alert-success"> {{ session('notice') }} </div>
         @endif
 
-        <h1> Welcome to Free and paid ebooks collection </h1>
+        <h2> Welcome to Free and paid ebooks collection </h2>
       </div>
     </div>
 
