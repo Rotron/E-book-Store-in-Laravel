@@ -10,7 +10,8 @@
         "barryvdh/laravel-debugbar": "^2.3",
         "google/recaptcha": "^1.1",
         "paypal/rest-api-sdk-php": "*",
-        "guzzlehttp/guzzle": "~6.0"
+        "guzzlehttp/guzzle": "~6.0",
+        "laravel/tinker": "^1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
