@@ -20,7 +20,7 @@
         </ul>
       </div>
     @endif
-    
+
     <h1> Login </h1>
     <form class="form-group" id="adminLogin" method="POST" action="login">
       <div class="form-group">
@@ -42,6 +42,6 @@
 
        <input type="submit" value="Login" id="adminLogin" name="login" class="btn btn-primary">
      </form>
-
+     <a href="/recover-password">Forgot password?</a>
   @endsection
 </div>

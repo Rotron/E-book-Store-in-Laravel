@@ -78,3 +78,6 @@ Route::get('listing/download/{id}', 'DownloadController@download');
 Route::get('test/{id}', 'OrderController@alreadyPurchased');
 
 Route::post('storeorder', 'OrderController@storeOrder');
+
+Route::get('recover-password', 'RecoverPasswordController@recoverPasswordView');
+Route::post('recover-password', 'RecoverPasswordController@recoverPassword');
