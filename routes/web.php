@@ -79,5 +79,8 @@ Route::get('test/{id}', 'OrderController@alreadyPurchased');
 
 Route::post('storeorder', 'OrderController@storeOrder');
 
-Route::get('recover-password', 'RecoverPasswordController@recoverPasswordView');
-Route::post('recover-password', 'RecoverPasswordController@recoverPassword');
+Route::get('reset-password', 'ResetPasswordController@resetPasswordView');
+Route::post('reset-password', 'ResetPasswordController@sendResetLink');
+
+Route::get('set-new-password/{username}/{resetToken}', 'ResetPasswordController@setNewPasswordView');
+Route::post('change-password/', 'ResetPasswordController@changePassword');

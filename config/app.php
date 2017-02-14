@@ -17,6 +17,7 @@ return [
     'gcaptcha_secret' => env('GCAPTCHA_SECRET', 'secret'),
     'gcaptcha_public' => env('GCAPTCHA_PUBLIC', 'secret'),
     'paypal_email' => env('PAYPAL_EMAIL'),
+    'email' => env('EMAIL', 'phpdevsami@gmail.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -167,6 +168,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
+        Laravel\Tinker\TinkerServiceProvider::class,
 
         /*
          * Package Service Providers...

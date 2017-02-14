@@ -42,6 +42,6 @@
 
        <input type="submit" value="Login" id="adminLogin" name="login" class="btn btn-primary">
      </form>
-     <a href="/recover-password">Forgot password?</a>
+     <a href="/reset-password">Forgot password?</a>
   @endsection
 </div>

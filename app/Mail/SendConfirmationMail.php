@@ -10,18 +10,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class SendConfirmationMail extends Mailable
 {
   use Queueable, SerializesModels;
-  
+
   public $username;
   public $confirmationCode;
 
-  public function __construct($username, $confirmationCode)
+  public function __construct($username)
   {
     $this->username = $username;
-    $this->confirmationCode = $confirmationCode;
+    $this->confirmationCode = str_random(20);
   }
 
   public function build()
   {
-    return $this->view('confirmation-mail');
+    return $this->view('layouts.confirmation-mail');
   }
 }

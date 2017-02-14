@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Auth;
 use App\Listing;
 
-class LoginController extends Controllers
+class DownloadController extends Controller
 {
   // Download files from storage folder
   public function download(int $id)

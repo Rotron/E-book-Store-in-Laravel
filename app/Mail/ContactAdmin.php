@@ -20,7 +20,7 @@ class ContactAdmin extends Mailable
 
     public function build()
     {
-        return $this->view('contact-mail-template')
+        return $this->view('layouts.contact-mail-template')
         ->replyTo($this->email, $this->name)
         ->subject(substr($this->message, 0, 50));
     }
