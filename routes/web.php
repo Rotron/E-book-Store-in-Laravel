@@ -12,6 +12,7 @@ use App\User;
 use App\Listing;
 use App\OrderSale;
 use App\Paypal\Paypal;
+
 // Home. Get mixed listings..
 Route::get('/', 'ListingController@index');
 
@@ -42,7 +43,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'redirectGuest'], function(){
 
 Route::group(['prefix' => 'admin', 'middleware' => array('redirectGuest', 'checkIfAdmin')], function(){
   Route::get('admincp', 'ListingController@admincp');
-  Route::get('logout', 'AdminLoginController@logout');
+  Route::get('logout', 'UserLoginController@logout');
 
   // Create a new listing
   Route::get('listing/new', 'ListingController@newListingView');

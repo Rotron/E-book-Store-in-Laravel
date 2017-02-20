@@ -22,13 +22,13 @@ class ResetPasswordController extends Controller
     {
         $this->username     = $request->input('username');
         $this->email        = $request->input('email');
-        $this->resetToken   = str_random(20);
+        $this->resetToken   = str_random(25);
 
-        if (count(User::where(['username' => $this->username, 'email' => $this->email])->get()) <= 0) {
+        if (User::where(['username' => $this->username, 'email' => $this->email])->count() <= 0) {
             return back()->withInput()->withErrors('Sorry no matching credentials found with those details');
         }
 
-        Mail::to(config('app.email'))->send(new SendResetMail($this->username, $this->email, $this->resetToken));
+        Mail::to($this->email)->send(new SendResetMail($this->username, $this->email, $this->resetToken));
 
         User::where('username', $this->username)->update(['recovery_token' => $this->resetToken]);
 

@@ -6,13 +6,13 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 class SendResetMail extends Mailable
 {
-    public $recoveryToken;
+    public $resetToken;
     public $username;
     public $email;
 
     public function __construct($username, $email, $resetToken)
     {
-        $this->recoveryToken = $resetToken;
+        $this->resetToken = $resetToken;
         $this->username = $username;
         $this->email = $email;
     }
