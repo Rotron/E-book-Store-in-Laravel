@@ -1,6 +1,6 @@
 # Mini E-book Store #
 **Sell or put them out for free**
-Work in progress..
+Work in progress.. check commits
 
 ![ebook_store_buy.png](https://bitbucket.org/repo/68ARMM/images/4152002795-ebook_store_buy.png)
 
