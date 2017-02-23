@@ -2,6 +2,8 @@
 
 use App\Http\Middleware\RedirectGuest;
 use App\Http\Middleware\RedirectIfLoggedIn;
+use App\Http\Middleware\SetLocale;
+
 use App\Liting;
 
 use Illuminate\Http\Request;
@@ -13,35 +15,36 @@ use App\Listing;
 use App\OrderSale;
 use App\Paypal\Paypal;
 
+
 // Home. Get mixed listings..
-Route::get('/', 'ListingController@index');
+Route::get('/{locale?}', 'ListingController@index')->name('home')->middleware('setLocale');
 
 // Get paid listings
-Route::get('/listings/paid', 'ListingController@paidListings');
-Route::get('listing/paid/{name}/{id}', 'ListingController@paidListing');
+Route::get('{locale?}/listings/paid', 'ListingController@paidListings');
+Route::get('{locale?}/listing/paid/{name}/{id}', 'ListingController@paidListing');
 
 // Get free listings
 Route::get('listings/free', 'ListingController@freeListings');
 Route::get('listing/free/{name}/{id}', 'ListingController@freeListing');
 
 // Login user
-Route::get('user/login', 'UserLoginController@LoginView')->name('/user/login')->middleware('redirectIfLoggedIn');
-Route::post('user/login', 'UserLoginController@login')->middleware('redirectIfLoggedIn');
-Route::get('user/logout', 'UserLoginController@logout')->middleware('redirectGuest');
 
 // Register user
-Route::group(['prefix' => 'user'], function(){
-  Route::get('/register', 'UserRegisterController@registerView')->middleware('redirectIfLoggedIn');
-  Route::post('/register', 'UserRegisterController@register')->middleware('redirectIfLoggedIn');
-  Route::get('/confirm/{username}/{confirmationCode}', 'UserRegisterController@confirm');
+Route::group(['prefix' => '{locale}/user/', 'middleware' => 'setLocale'], function(){
+  Route::get('register', 'UserRegisterController@registerView')->middleware('redirectIfLoggedIn');
+  Route::post('register', 'UserRegisterController@register')->middleware('redirectIfLoggedIn');
+  Route::get('confirm/{username}/{confirmationCode}', 'UserRegisterController@confirm');
+  Route::get('login', 'UserLoginController@LoginView')->name('/user/login')->middleware('redirectIfLoggedIn');
+  Route::post('login', 'UserLoginController@login')->middleware('redirectIfLoggedIn');
+  Route::get('logout', 'UserLoginController@logout')->middleware('redirectGuest');
 });
 
 // UserCP
-Route::group(['prefix' => 'user', 'middleware' => 'redirectGuest'], function(){
+Route::group(['prefix' => '{locale}/user', 'middleware' => 'redirectGuest'], function(){
   Route::get('usercp', 'UsercpController@index');
 });
 
-Route::group(['prefix' => 'admin', 'middleware' => array('redirectGuest', 'checkIfAdmin')], function(){
+Route::group(['prefix' => '/{locale}/admin', 'middleware' => array('redirectGuest', 'checkIfAdmin')], function(){
   Route::get('admincp', 'ListingController@admincp');
   Route::get('logout', 'UserLoginController@logout');
 
@@ -69,19 +72,21 @@ Route::group(['prefix' => 'admin', 'middleware' => array('redirectGuest', 'check
   Route::post('search', 'ManageUserController@searchUser');
 });
 
-Route::get('contact', 'ContactAdminController@contactView');
-Route::post('send-mail', 'ContactAdminController@validateAdminContact');
+Route::group(['prefix' => '{locale?}'], function(){
+    Route::get('contact', 'ContactAdminController@contactView');
+    Route::post('send-mail', 'ContactAdminController@validateAdminContact');
 
-Route::post('callback-paypal', 'OrderController@callbackPaypal');
+    Route::post('callback-paypal', 'OrderController@callbackPaypal');
 
-Route::get('listing/download/{id}', 'DownloadController@download');
+    Route::get('listing/download/{id}', 'DownloadController@download');
 
-Route::get('test/{id}', 'OrderController@alreadyPurchased');
+    // Route::get('test/{id}', 'OrderController@alreadyPurchased');
 
-Route::post('storeorder', 'OrderController@storeOrder');
+    Route::post('storeorder', 'OrderController@storeOrder');
 
-Route::get('reset-password', 'ResetPasswordController@resetPasswordView');
-Route::post('reset-password', 'ResetPasswordController@sendResetLink');
+    Route::get('reset-password', 'ResetPasswordController@resetPasswordView');
+    Route::post('reset-password', 'ResetPasswordController@sendResetLink');
 
-Route::get('set-new-password/{username}/{resetToken}', 'ResetPasswordController@setNewPasswordView');
-Route::post('change-password/', 'ResetPasswordController@changePassword');
+    Route::get('set-new-password/{username}/{resetToken}', 'ResetPasswordController@setNewPasswordView');
+    Route::post('change-password/', 'ResetPasswordController@changePassword');
+});

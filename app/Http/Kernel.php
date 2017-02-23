@@ -54,5 +54,6 @@ class Kernel extends HttpKernel
         'redirectGuest' => \App\Http\Middleware\RedirectGuest::class,
         'redirectIfLoggedIn' => \App\Http\Middleware\RedirectIfLoggedIn::class,
         'checkIfAdmin' => \App\Http\Middleware\CheckIfAdmin::class,
+        'setLocale' => \App\Http\Middleware\SetLocale::class,
     ];
 }

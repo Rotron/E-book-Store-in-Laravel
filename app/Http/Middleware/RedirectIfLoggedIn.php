@@ -10,7 +10,7 @@ class RedirectIfLoggedIn
     public function handle($request, Closure $next)
     {
       if (Auth::check()) {
-        return redirect('admin/admincp');
+        return redirect($request->route('locale') . '/user/usercp');
       }
       return $next($request);
     }

@@ -13,7 +13,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        \URL::macro('currentRouteWithLocale', function(string $locale, bool $absolute = true) {
+            /** @var \Illuminate\Routing\Route $route */
+            $route = $this->request->route();
+
+            $parameters = $route->parameters();
+            $parameters['locale'] = $locale;
+
+            return $this->toRoute($route, $parameters, $absolute);
+        });
     }
 
     /**

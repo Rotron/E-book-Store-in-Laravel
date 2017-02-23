@@ -23,9 +23,11 @@
       @yield('content')
 
       <div class="row">
-        @section('footer')
-          @include('footer')
-        @show
+        <div class="col-md-12">
+            @section('footer')
+              @include('footer')
+            @show
+        </div>
       </div>
 
     </div>
