@@ -54,7 +54,7 @@ class ListingController extends Controller
     }
 
     // Expand PAID listing.
-    public function paidListing(string $name, int $id)
+    public function paidListing($name, $id)
     {
         if(Auth::user() != null) {
             $alreadyPurchased = Auth::user()->orders()->where('listing_id', $id)->get();

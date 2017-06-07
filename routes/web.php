@@ -4,7 +4,7 @@ use App\Http\Middleware\RedirectGuest;
 use App\Http\Middleware\RedirectIfLoggedIn;
 use App\Http\Middleware\SetLocale;
 
-use App\Liting;
+
 
 use Illuminate\Http\Request;
 
@@ -17,11 +17,11 @@ use App\Paypal\Paypal;
 
 
 // Home. Get mixed listings..
-Route::get('/{locale?}', 'ListingController@index')->name('home')->middleware('setLocale');
+Route::get('/', 'ListingController@index')->name('home');
 
 // Get paid listings
-Route::get('{locale?}/listings/paid', 'ListingController@paidListings');
-Route::get('{locale?}/listing/paid/{name}/{id}', 'ListingController@paidListing');
+Route::get('/listings/paid', 'ListingController@paidListings');
+Route::get('/listing/paid/{name}/{id}', 'ListingController@paidListing');
 
 // Get free listings
 Route::get('listings/free', 'ListingController@freeListings');
@@ -30,7 +30,7 @@ Route::get('listing/free/{name}/{id}', 'ListingController@freeListing');
 // Login user
 
 // Register user
-Route::group(['prefix' => '{locale}/user/', 'middleware' => 'setLocale'], function(){
+Route::group(['prefix' => '/user/'], function(){
   Route::get('register', 'UserRegisterController@registerView')->middleware('redirectIfLoggedIn');
   Route::post('register', 'UserRegisterController@register')->middleware('redirectIfLoggedIn');
   Route::get('confirm/{username}/{confirmationCode}', 'UserRegisterController@confirm');
@@ -40,11 +40,11 @@ Route::group(['prefix' => '{locale}/user/', 'middleware' => 'setLocale'], functi
 });
 
 // UserCP
-Route::group(['prefix' => '{locale}/user', 'middleware' => 'redirectGuest'], function(){
+Route::group(['prefix' => '/user', 'middleware' => 'redirectGuest'], function(){
   Route::get('usercp', 'UsercpController@index');
 });
 
-Route::group(['prefix' => '/{locale}/admin', 'middleware' => array('redirectGuest', 'checkIfAdmin')], function(){
+Route::group(['prefix' => '/admin', 'middleware' => array('redirectGuest', 'checkIfAdmin')], function(){
   Route::get('admincp', 'ListingController@admincp');
   Route::get('logout', 'UserLoginController@logout');
 
@@ -72,7 +72,7 @@ Route::group(['prefix' => '/{locale}/admin', 'middleware' => array('redirectGues
   Route::post('search', 'ManageUserController@searchUser');
 });
 
-Route::group(['prefix' => '{locale?}'], function(){
+
     Route::get('contact', 'ContactAdminController@contactView');
     Route::post('send-mail', 'ContactAdminController@validateAdminContact');
 
@@ -89,4 +89,4 @@ Route::group(['prefix' => '{locale?}'], function(){
 
     Route::get('set-new-password/{username}/{resetToken}', 'ResetPasswordController@setNewPasswordView');
     Route::post('change-password/', 'ResetPasswordController@changePassword');
-});
+
