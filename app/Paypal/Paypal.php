@@ -75,10 +75,10 @@
 
 
     /**
-    /* Converts the querystring to usable key => value array()
-    /* adds 'cmd=_notify-validate' to it.
-    /* Always uses ipn_log.txt file as source of data.
-    /* Used by formatDataCentral() method
+     * Converts the querystring to usable key => value array()
+     * adds 'cmd=_notify-validate' to it.
+     * Always uses ipn_log.txt file as source of data.
+     * Used by formatDataCentral() method
     */
     private function dataFormatter($data)
     {
@@ -93,10 +93,10 @@
 
 
     /**
-    /* Formats data either from:
-    /* 'stream': php://input, 'stored': ipn_log.txt
-    /* Formatting from stream is used for live callback() method
-    /* Formatting from stored is always used for tests
+     * Formats data either from:
+     * 'stream': php://input, 'stored': ipn_log.txt
+     * Formatting from stream is used for live callback() method
+     * Formatting from stored is always used for tests
     */
     public function formatDataCentral($formatType)
     {
@@ -117,10 +117,10 @@
 
 
     /**
-    /* Display query string or an array stored in the ipn_log.txt
-    /* Accepts as arguement 'raw' or 'array'
-    /* 'raw' will return the query string strored in ipn_log.txt
-    /* 'array' will return a properly formatted array
+     * Display query string or an array stored in the ipn_log.txt
+     * Accepts as arguement 'raw' or 'array'
+     * 'raw' will return the query string strored in ipn_log.txt
+     * 'array' will return a properly formatted array
     */
     public function displayData($requestDataType)
     {
@@ -146,10 +146,10 @@
 
 
     /**
-    /* Make a test call to paypal using querystring from ipn_log.txt
-    /* ipn_log.txt must already have the querystring to postback.
-    /* If ipn_log.txt doesn't have querystring make
-    /* a test IPN request from sandbox to this storeData() method.
+     * Make a test call to paypal using querystring from ipn_log.txt
+     * ipn_log.txt must already have the querystring to postback.
+     * If ipn_log.txt doesn't have querystring make
+     * a test IPN request from sandbox to this storeData() method.
     */
     public function fakeCallbackToPaypal($callType)
     {
@@ -193,9 +193,9 @@
 
 
     /**
-    /* Store data in ipn_log.txt file.
-    /* Use IPN tester to post data to this method.
-    */
+     * Store data in ipn_log.txt file.
+     * Use IPN tester to post data to this method.
+     */
     public function storeData()
     {
       self::checkStream();
@@ -210,13 +210,13 @@
     }
 
     /**
-    /* Post sample data to your listener
-    /* This is sample data taken from paypal.
-    /* Hence will return invalid. You can use this method to store fake data
-    /* to your ipn_log.txt file. This will automatically POST the data to your
-    /* listener file. From there you can use storeData() method to store it.
-    /* Make sure you disable the CSRF to your listener url.
-    */
+     * Post sample data to your listener
+     * This is sample data taken from paypal.
+     * Hence will return invalid. You can use this method to store fake data
+     * to your ipn_log.txt file. This will automatically POST the data to your
+     * listener file. From there you can use storeData() method to store it.
+     * Make sure you disable the CSRF to your listener url.
+     */
     public function postSampleDataToListener($listenerUrl, $sampleData)
     {
       try {
@@ -263,9 +263,9 @@
     }
 
     /**
-    /* Check that client paid right amount for the right product.
-    /* Check transaction is 'Completed'
-    /*
+     * Check that client paid right amount for the right product.
+     * Check transaction is 'Completed'
+     *
     */
     public function isCorrectPayment(Request $request)
     {
@@ -290,9 +290,9 @@
 
 
     /**
-    /* Transaction id is always unique. If transaction id already exists in the
-    /* database it means you've already processed that transaction.
-    /* This method is to check exactly that.
+     * Transaction id is always unique. If transaction id already exists in the
+     * database it means you've already processed that transaction.
+     * This method is to check exactly that.
     */
     public function isDoublePost()
     {
